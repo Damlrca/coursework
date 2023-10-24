@@ -1,12 +1,13 @@
 #include <iostream>
 extern "C" {
 	#include "mmio.h"
+//#include "MatrixIO.h"
 }
-#include <random>
 #include <cmath>
+#include <random>
 #include <algorithm>
 #include <chrono>
-#include <omp.h>
+//#include <omp.h>
 using namespace std;
 using namespace std::chrono;
 using myclock = chrono::system_clock;
@@ -24,9 +25,9 @@ void delete_matrix(int* N, int* M, int* nz, double** val, int** I, int** J) {
 	*N = 0;
 	*M = 0;
 	*nz = 0;
-	delete[] * val;
-	delete[] * I;
-	delete[] * J;
+	free(*val);
+	free(*I);
+	free(*J);
 }
 
 void COO_to_CSR(int N, int M, int nz, double* val, int* I, int* J, int** _row_id, int** _col, double** _value) {
