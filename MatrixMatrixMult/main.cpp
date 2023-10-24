@@ -86,7 +86,7 @@ void create_transposed(int N_A, int M_A, int* A_row_id, int* A_col, double* A_va
 int main() {
 	// read matrix
 	start_time = myclock::now();
-	int N, M, nz;
+	int N, M, nz; // N - number of rows, M - number of columns
 	int* I;
 	int* J;
 	double* val;
