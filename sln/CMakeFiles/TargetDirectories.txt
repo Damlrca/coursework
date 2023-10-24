@@ -1,5 +1,0 @@
-D:/source/coursework/sln/CMakeFiles/ALL_BUILD.dir
-D:/source/coursework/sln/CMakeFiles/ZERO_CHECK.dir
-D:/source/coursework/sln/MatrixIO/CMakeFiles/MatrixIO.dir
-D:/source/coursework/sln/MatrixMatrixMult/CMakeFiles/MatrixMatrixMult.dir
-D:/source/coursework/sln/MTXtoBINconverter/CMakeFiles/MTXtoBINconverter.dir

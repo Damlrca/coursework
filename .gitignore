@@ -400,3 +400,5 @@ FodyWeavers.xsd
 #############################################################
 # Matrix Market files
 *.mtx
+# Directory for solution
+sln/
