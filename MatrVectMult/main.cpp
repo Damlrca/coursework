@@ -46,6 +46,10 @@ void COO_to_CSR(int N, int M, int nz, double* val, int* I, int* J, int** _row_id
 		value[row_id[I[i]]] = val[i];
 		++row_id[I[i]];
 	}
+	for (int i = N; i - 1 >= 0; i--) {
+		row_id[i] -= row_id[i] - row_id[i - 1];
+	}
+	row_id[0] = 0;
 	*_row_id = row_id;
 	*_col = col;
 	*_value = value;
@@ -117,7 +121,7 @@ int main() {
 	// one thread, direct
 	start_time = myclock::now();
 	double* Result_direct = new double[N];
-	memset(Result_direct, 0, sizeof(int) * N);
+	memset(Result_direct, 0, sizeof(double) * N);
 	for (int i = 0; i < nz; i++) {
 		Result_direct[I[i]] += val[i] * V[J[i]];
 	}
@@ -127,7 +131,7 @@ int main() {
 	// one thread, CSR
 	start_time = myclock::now();
 	double* Result_CSR = new double[N];
-	memset(Result_CSR, 0, sizeof(int) * N);
+	memset(Result_CSR, 0, sizeof(double) * N);
 	for (int i = 0; i < N; i++) {
 		int a = row_id[i];
 		int b = row_id[i + 1];
