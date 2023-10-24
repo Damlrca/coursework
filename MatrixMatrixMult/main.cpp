@@ -1,7 +1,6 @@
 #include <iostream>
 extern "C" {
-	#include "mmio.h"
-//#include "MatrixIO.h"
+#include "MatrixIO.h"
 }
 #include <cmath>
 #include <random>
@@ -14,12 +13,6 @@ using myclock = chrono::system_clock;
 myclock::time_point start_time, end_time;
 
 const char* filename = "D:\\source\\coursework\\Freescale1.mtx";
-
-int read_matrix(const char* filename, int* N, int* M, int* nz, double** val, int** I, int** J) {
-	return mm_read_unsymmetric_sparse(filename, N, M, nz, val, I, J);
-	// TODO: mm_read_unsymmetric_sparse разобраться в каком порядке эта функция принимает M и N
-	// На текущей матрице не важно, так как матрица квадратная, но на других может что-то поломаться
-}
 
 void delete_matrix(int* N, int* M, int* nz, double** val, int** I, int** J) {
 	*N = 0;
@@ -97,8 +90,8 @@ int main() {
 	int* I;
 	int* J;
 	double* val;
-	if (read_matrix(filename, &N, &M, &nz, &val, &I, &J) != 0) {
-		cout << "error in reading matrix" << endl;
+	if (read_matrix_MTX(filename, &N, &M, &nz, &val, &I, &J) != 0) {
+		cout << "Failed to read matrix" << endl;
 		return -1;
 	}
 	end_time = myclock::now();
