@@ -35,19 +35,19 @@ void COO_to_CSR(int N, int M, int nz, double* val, int* I, int* J, int** _row_id
 	int* col = new int[nz];
 	double* value = new double[nz];
 	memset(row_id, 0, sizeof(int) * (N + 1));
-	for (int i = 0; i < nz; i++) {
+	for (int i = 0; i < nz; ++i) {
 		row_id[I[i] + 1]++;
 	}
-	for (int i = 1; i < N + 1; i++) {
+	for (int i = 1; i < N + 1; ++i) {
 		row_id[i] += row_id[i - 1];
 	}
-	for (int i = 0; i < nz; i++) {
+	for (int i = 0; i < nz; ++i) {
 		col[row_id[I[i]]] = J[i];
 		value[row_id[I[i]]] = val[i];
 		++row_id[I[i]];
 	}
-	for (int i = N; i - 1 >= 0; i--) {
-		row_id[i] -= row_id[i] - row_id[i - 1];
+	for (int i = N; i - 1 >= 0; --i) {
+		row_id[i] = row_id[i - 1];
 	}
 	row_id[0] = 0;
 	*_row_id = row_id;

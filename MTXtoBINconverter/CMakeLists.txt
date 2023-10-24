@@ -1,0 +1,4 @@
+add_executable(MTXtoBINconverter main.cpp)
+
+target_include_directories(MTXtoBINconverter PUBLIC ../MatrixIO)
+target_link_libraries(MTXtoBINconverter PUBLIC MatrixIO)
