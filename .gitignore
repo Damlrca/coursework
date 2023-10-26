@@ -402,3 +402,5 @@ FodyWeavers.xsd
 *.mtx
 # Directory for solution
 sln/
+# Binary files
+*.bin

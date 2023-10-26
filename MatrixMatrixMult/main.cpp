@@ -1,8 +1,11 @@
 #include <iostream>
 extern "C" {
 #include "MatrixIO.h"
+#include "MatrixUtils.h"
 }
 #include <cmath>
+#include <cstring>
+#include <cstdlib>
 #include <random>
 #include <algorithm>
 #include <chrono>
@@ -12,51 +15,8 @@ using namespace std::chrono;
 using myclock = chrono::system_clock;
 myclock::time_point start_time, end_time;
 
-const char* filename = "D:\\source\\coursework\\Freescale1.mtx";
-
-void delete_matrix(int* N, int* M, int* nz, double** val, int** I, int** J) {
-	*N = 0;
-	*M = 0;
-	*nz = 0;
-	free(*val);
-	free(*I);
-	free(*J);
-}
-
-void COO_to_CSR(int N, int M, int nz, double* val, int* I, int* J, int** _row_id, int** _col, double** _value) {
-	// UNORDERED CSR !!!
-	int* row_id = new int[N + 1];
-	int* col = new int[nz];
-	double* value = new double[nz];
-	memset(row_id, 0, sizeof(int) * (N + 1));
-	for (int i = 0; i < nz; ++i) {
-		row_id[I[i] + 1]++;
-	}
-	for (int i = 1; i < N + 1; ++i) {
-		row_id[i] += row_id[i - 1];
-	}
-	for (int i = 0; i < nz; ++i) {
-		col[row_id[I[i]]] = J[i];
-		value[row_id[I[i]]] = val[i];
-		++row_id[I[i]];
-	}
-	for (int i = N; i - 1 >= 0; --i) {
-		row_id[i] = row_id[i - 1];
-	}
-	row_id[0] = 0;
-	*_row_id = row_id;
-	*_col = col;
-	*_value = value;
-}
-
-void delete_CSR(int** _row_id, int** _col, double** _value) {
-	delete[] * _row_id;
-	delete[] * _col;
-	delete[] * _value;
-	*_row_id = nullptr;
-	*_col = nullptr;
-	*_value = nullptr;
-}
+//const char* filename = "D:\\source\\coursework\\Freescale1.mtx";
+const char* filename = "D:\\source\\coursework\\Freescale1.bin";
 
 /*
 void create_transposed(int N_A, int M_A, int* A_row_id, int* A_col, double* A_value,
@@ -90,7 +50,8 @@ int main() {
 	int* I;
 	int* J;
 	double* val;
-	if (read_matrix_MTX(filename, &N, &M, &nz, &val, &I, &J) != 0) {
+	//if (read_matrix_MTX(filename, &N, &M, &nz, &val, &I, &J) != 0) {
+	if (read_matrix_BIN(filename, &N, &M, &nz, &val, &I, &J) != 0) {
 		cout << "Failed to read matrix" << endl;
 		return -1;
 	}

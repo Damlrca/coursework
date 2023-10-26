@@ -39,7 +39,7 @@ int read_matrix_MTX(const char* fname, int* M_, int* N_, int* nz_, double** val_
         return -1;
     }
 
-    if (mm_is_general(matcode)) {
+    if (mm_is_general(matcode)) { // matrix is unsymmetric
         I = (int*)malloc(nz * sizeof(int));
         J = (int*)malloc(nz * sizeof(int));
         val = (double*)malloc(nz * sizeof(double));
@@ -94,6 +94,49 @@ int read_matrix_MTX(const char* fname, int* M_, int* N_, int* nz_, double** val_
         *J_ = J;
     }
 
+    fclose(f);
+    return 0;
+}
+
+// binary format
+// M (rows) - int
+// N (columns) - int
+// nz (number of non-zero elements) - int
+// val[nz] - doubles
+// I[nz] - ints
+// J[nz] ints
+
+int save_matrix_BIN(const char* fname, int M_, int N_, int nz_, double* val_, int* I_, int* J_) {
+    FILE* f;
+    if ((f = fopen(fname, "wb")) == NULL) {
+        printf("save_matrix_BIN: Failed to open file %s\n", fname);
+        return -1;
+    }
+    fwrite(&M_, sizeof(int), 1, f);
+    fwrite(&N_, sizeof(int), 1, f);
+    fwrite(&nz_, sizeof(int), 1, f);
+    fwrite(val_, sizeof(double), nz_, f);
+    fwrite(I_, sizeof(int), nz_, f);
+    fwrite(J_, sizeof(int), nz_, f);
+    fclose(f);
+    return 0;
+}
+
+int read_matrix_BIN(const char* fname, int* M_, int* N_, int* nz_, double** val_, int** I_, int** J_) {
+    FILE* f;
+    if ((f = fopen(fname, "rb")) == NULL) {
+        printf("read_matrix_BIN: Failed to open file %s\n", fname);
+        return -1;
+    }
+    fread(M_, sizeof(int), 1, f);
+    fread(N_, sizeof(int), 1, f);
+    fread(nz_, sizeof(int), 1, f);
+    *val_ = (double*)malloc(*nz_ * sizeof(double));
+    *I_ = (int*)malloc(*nz_ * sizeof(int));
+    *J_ = (int*)malloc(*nz_ * sizeof(int));
+    fread(*val_, sizeof(double), *nz_, f);
+    fread(*I_, sizeof(int), *nz_, f);
+    fread(*J_, sizeof(int), *nz_, f);
     fclose(f);
     return 0;
 }
