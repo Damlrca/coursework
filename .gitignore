@@ -400,6 +400,8 @@ FodyWeavers.xsd
 #############################################################
 # Matrix Market files
 *.mtx
+# Small matrix for tests
+!littlematrix.mtx
 # Directory for solution
 sln/
 # Binary files
