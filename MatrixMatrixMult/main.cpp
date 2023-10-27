@@ -90,8 +90,8 @@ void small_test() {
 	cout << "CSR:" << endl;
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < M; j++) {
-			if (mA[i][j] >= 0) cout << " ";
-			cout << mA[i][j] << " ";
+			if (mB[i][j] >= 0) cout << " ";
+			cout << mB[i][j] << " ";
 		}
 		cout << endl;
 	}
