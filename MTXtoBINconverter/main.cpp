@@ -14,21 +14,18 @@ const char* filename_out = "D:\\source\\coursework\\testmatrices\\littlematrix.b
 int main() {
 	// read MTX matrix
 	start_time = myclock::now();
-	int N, M, nz; // N - number of rows, M - number of columns
-	int* I;
-	int* J;
-	double* val;
-	if (read_matrix_MTX(filename_in, &N, &M, &nz, &val, &I, &J) != 0) {
+	matrix_COO mtx;
+	if (read_matrix_MTX(filename_in, &mtx) != 0) {
 		cout << "Failed to read matrix" << endl;
 		return -1;
 	}
 	end_time = myclock::now();
 	cout << "matrix read succsessfully" << " in " << duration_cast<milliseconds>(end_time - start_time).count() << "ms" << endl;
-	cout << "N: " << N << ", M: " << M << ", nz: " << nz << endl;
+	cout << "N: " << mtx.N << ", M: " << mtx.M << ", nz: " << mtx.nz << endl;
 
 	// write BIN watrix
 	start_time = myclock::now();
-	if (save_matrix_BIN(filename_out, N, M, nz, val, I, J) != 0) {
+	if (save_matrix_BIN(filename_out, &mtx) != 0) {
 		cout << "Failed to save matrix" << endl;
 		return -1;
 	}

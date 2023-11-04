@@ -20,24 +20,21 @@ const char* filename = "D:\\source\\coursework\\Freescale1.bin";
 
 void small_test() {
 	cout << fixed; cout.precision(2);
-	// small matrix 7x7 for tests
+	// small matrix 7x5 for tests
 	const char* file_bin = "D:\\source\\coursework\\testmatrices\\littlematrix.bin";
 	const char* file_mtx = "D:\\source\\coursework\\testmatrices\\littlematrix.mtx";
 
 	// COO MTX, mU
-	int N_mtx, M_mtx, nz_mtx;
-	double* val_mtx;
-	int* I_mtx;
-	int* J_mtx;
-	read_matrix_MTX(file_mtx, &N_mtx, &M_mtx, &nz_mtx, &val_mtx, &I_mtx, &J_mtx);
-	cout << "Matrix" << " " << file_mtx << endl;
-	cout << "N: " << N_mtx << ", M: " << M_mtx << ", nz: " << nz_mtx << endl;
-	vector<vector<double>> mU(N_mtx, vector<double>(M_mtx));
-	for (int i = 0; i < nz_mtx; i++) {
-		mU[I_mtx[i]][J_mtx[i]] = val_mtx[i];
+	matrix_COO mtx1;
+	read_matrix_MTX(file_mtx, &mtx1);
+	cout << "Matrix " << file_mtx << endl;
+	cout << "N: " << mtx1.N << ", M: " << mtx1.M << ", nz: " << mtx1.nz << endl;
+	vector<vector<double>> mU(mtx1.N, vector<double>(mtx1.M));
+	for (int i = 0; i < mtx1.nz; i++) {
+		mU[mtx1.I[i]][mtx1.J[i]] = mtx1.val[i];
 	}
-	for (int i = 0; i < N_mtx; i++) {
-		for (int j = 0; j < M_mtx; j++) {
+	for (int i = 0; i < mtx1.N; i++) {
+		for (int j = 0; j < mtx1.M; j++) {
 			if (mU[i][j] >= 0) cout << " ";
 			cout << mU[i][j] << " ";
 		}
@@ -45,19 +42,16 @@ void small_test() {
 	}
 
 	// COO BIN, mA
-	int N, M, nz;
-	double* val;
-	int* I;
-	int* J;
-	read_matrix_BIN(file_bin, &N, &M, &nz, &val, &I, &J);
-	cout << "Matrix" << " " << file_bin << endl;
-	cout << "N: " << N << ", M: " << M << ", nz: " << nz << endl;
-	vector<vector<double>> mA(N, vector<double>(M));
-	for (int i = 0; i < nz; i++) {
-		mA[I[i]][J[i]] = val[i];
+	matrix_COO mtx2;
+	read_matrix_BIN(file_bin, &mtx2);
+	cout << "Matrix " << file_bin << endl;
+	cout << "N: " << mtx2.N << ", M: " << mtx2.M << ", nz: " << mtx2.nz << endl;
+	vector<vector<double>> mA(mtx2.N, vector<double>(mtx2.M));
+	for (int i = 0; i < mtx2.nz; i++) {
+		mA[mtx2.I[i]][mtx2.J[i]] = mtx2.val[i];
 	}
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < M; j++) {
+	for (int i = 0; i < mtx2.N; i++) {
+		for (int j = 0; j < mtx2.M; j++) {
 			if (mA[i][j] >= 0) cout << " ";
 			cout << mA[i][j] << " ";
 		}
@@ -65,8 +59,8 @@ void small_test() {
 	}
 
 	// mU == mA ?
-	for (int i = 0; i < N_mtx; i++) {
-		for (int j = 0; j < M_mtx; j++) {
+	for (int i = 0; i < mtx2.N; i++) {
+		for (int j = 0; j < mtx2.M; j++) {
 			if (mU[i][j] != mA[i][j]) {
 				cout << "mU == mA: " << i << " " << j << " " << mU[i][j] << " " << mA[i][j] << endl;
 			}
@@ -74,22 +68,21 @@ void small_test() {
 	}
 
 	// COO to CSR, mB
-	int* row_id;
-	int* col;
-	double* value;
-	COO_to_CSR(N, M, nz, val, I, J, &row_id, &col, &value);
-	vector<vector<double>> mB(N, vector<double>(M));
-	for (int i = 0; i < N; i++) {
-		int a = row_id[i];
-		int b = row_id[i + 1];
+	matrix_CSR mtx3;
+	COO_to_CSR(&mtx2, &mtx3);
+	vector<vector<double>> mB(mtx3.N, vector<double>(mtx3.M));
+	for (int i = 0; i < mtx3.N; i++) {
+		int a = mtx3.row_id[i];
+		int b = mtx3.row_id[i + 1];
 		while (a != b) {
-			mB[i][col[a]] = value[a];
+			mB[i][mtx3.col[a]] = mtx3.value[a];
 			++a;
 		}
 	}
-	cout << "CSR:" << endl;
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < M; j++) {
+	cout << "Matrix COO_to_CSR:" << endl;
+	cout << "N: " << mtx3.N << ", M: " << mtx3.M << endl;
+	for (int i = 0; i < mtx3.N; i++) {
+		for (int j = 0; j < mtx3.M; j++) {
 			if (mB[i][j] >= 0) cout << " ";
 			cout << mB[i][j] << " ";
 		}
@@ -97,8 +90,8 @@ void small_test() {
 	}
 
 	// mA == mB ?
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < M; j++) {
+	for (int i = 0; i < mtx3.N; i++) {
+		for (int j = 0; j < mtx3.M; j++) {
 			if (mA[i][j] != mB[i][j]) {
 				cout << "mA != mB: " << i << " " << j << " " << mA[i][j] << " " << mB[i][j] << endl;
 			}
@@ -110,7 +103,7 @@ void small_test() {
 	int* row_id_T;
 	int* col_T;
 	double* value_T;
-	create_transposed(N, M, row_id, col, value, &N_T, &M_T, &row_id_T, &col_T, &value_T);
+	create_transposed(mtx2.N, mtx2.M, mtx3.row_id, mtx3.col, mtx3.value, &N_T, &M_T, &row_id_T, &col_T, &value_T);
 	cout << "transposed: ";
 	cout << "N_T: " << N_T << ", M_T: " << M_T << ", nz_T: " << row_id_T[N_T] << endl;
 	vector<vector<double>> mT(N_T, vector<double>(M_T));
@@ -132,17 +125,17 @@ void small_test() {
 	}
 
 	// mA == mT^T ?
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < M; j++) {
+	for (int i = 0; i < mtx2.N; i++) {
+		for (int j = 0; j < mtx2.M; j++) {
 			if (mA[i][j] != mT[j][i])
 				cout << "mA != mT^T: " << i << " " << j << " " << mA[i][j] << " " << mT[j][i] << endl;
 		}
 	}
 
-	delete_COO(&val_mtx, &I_mtx, &J_mtx);
-	delete_COO(&val, &I, &J);
-	delete_CSR(&row_id, &col, &value);
-	delete_CSR(&row_id_T, &col_T, &value_T);
+	delete_COO(&mtx1);
+	delete_COO(&mtx2);
+	delete_CSR(&mtx3);
+	//_delete_CSR(&row_id_T, &col_T, &value_T);
 };
 
 int main() {
@@ -155,7 +148,7 @@ int main() {
 	int* I;
 	int* J;
 	double* val;
-	if (read_matrix_BIN(filename, &N, &M, &nz, &val, &I, &J) != 0) {
+	if (__read_matrix_BIN(filename, &N, &M, &nz, &val, &I, &J) != 0) {
 		cout << "Failed to read matrix" << endl;
 		return -1;
 	}
@@ -167,7 +160,7 @@ int main() {
 	int* row_id;
 	int* col;
 	double* value;
-	COO_to_CSR(N, M, nz, val, I, J, &row_id, &col, &value);
+	_COO_to_CSR(N, M, nz, val, I, J, &row_id, &col, &value);
 
 	// Generate vector V
 	double* V = new double[M];
@@ -208,8 +201,8 @@ int main() {
 		Max_diff = max(Max_diff, abs(Result_direct[i] - Result_CSR[i]));
 	cout << "Max_diff in result vectors (direct, CSR): " << Max_diff << endl;
 
-	delete_COO(&val, &I, &J);
-	delete_CSR(&row_id, &col, &value);
+	//_delete_COO(&val, &I, &J);
+	//_delete_CSR(&row_id, &col, &value);
 	N = 0; M = 0; nz = 0;
 	delete[] V;
 

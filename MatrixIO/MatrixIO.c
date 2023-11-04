@@ -7,7 +7,19 @@
 
 #include "mmio.h"
 
-int read_matrix_MTX(const char* fname, int* M_, int* N_, int* nz_, double** val_, int** I_, int** J_) {
+int read_matrix_MTX(const char* fname, matrix_COO* mtx) {
+    return __read_matrix_MTX(fname, &mtx->N, &mtx->M, &mtx->nz, &mtx->val, &mtx->I, &mtx->J);
+}
+
+int save_matrix_BIN(const char* fname, matrix_COO* mtx) {
+    return __save_matrix_BIN(fname, mtx->N, mtx->M, mtx->nz, mtx->val, mtx->I, mtx->J);
+}
+
+int read_matrix_BIN(const char* fname, matrix_COO* mtx) {
+    return __read_matrix_BIN(fname, &mtx->N, &mtx->M, &mtx->nz, &mtx->val, &mtx->I, &mtx->J);
+}
+
+int __read_matrix_MTX(const char* fname, int* M_, int* N_, int* nz_, double** val_, int** I_, int** J_) {
     // based on mm_read_unsymmetric_sparse
 
     FILE* f;
@@ -106,7 +118,7 @@ int read_matrix_MTX(const char* fname, int* M_, int* N_, int* nz_, double** val_
 // I[nz] - ints
 // J[nz] ints
 
-int save_matrix_BIN(const char* fname, int M_, int N_, int nz_, double* val_, int* I_, int* J_) {
+int __save_matrix_BIN(const char* fname, int M_, int N_, int nz_, double* val_, int* I_, int* J_) {
     FILE* f;
     if ((f = fopen(fname, "wb")) == NULL) {
         printf("save_matrix_BIN: Failed to open file %s\n", fname);
@@ -122,7 +134,7 @@ int save_matrix_BIN(const char* fname, int M_, int N_, int nz_, double* val_, in
     return 0;
 }
 
-int read_matrix_BIN(const char* fname, int* M_, int* N_, int* nz_, double** val_, int** I_, int** J_) {
+int __read_matrix_BIN(const char* fname, int* M_, int* N_, int* nz_, double** val_, int** I_, int** J_) {
     FILE* f;
     if ((f = fopen(fname, "rb")) == NULL) {
         printf("read_matrix_BIN: Failed to open file %s\n", fname);

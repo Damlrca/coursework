@@ -4,19 +4,31 @@
 #include <string.h>
 #include <stdlib.h>
 
-void delete_COO(double** val, int** I, int** J) {
-	free(*val); *val = NULL;
-	free(*I); *I = NULL;
-	free(*J); *J = NULL;
+void delete_COO(matrix_COO* mtx) {
+	mtx->N = 0;
+	mtx->M = 0;
+	mtx->nz = 0;
+	free(mtx->val); mtx->val = NULL;
+	free(mtx->I); mtx->I = NULL;
+	free(mtx->J); mtx->J = NULL;
 }
 
-void delete_CSR(int** _row_id, int** _col, double** _value) {
-	free(*_row_id); *_row_id = NULL;
-	free(*_col); *_col = NULL;
-	free(*_value); *_value = NULL;
+void delete_CSR(matrix_CSR* mtx) {
+	mtx->N = 0;
+	mtx->M = 0;
+	free(mtx->value); mtx->value = NULL;
+	free(mtx->row_id); mtx->row_id = NULL;
+	free(mtx->col); mtx->col = NULL;
 }
 
-void COO_to_CSR(int N, int M, int nz, double* val, int* I, int* J, int** _row_id, int** _col, double** _value) {
+void COO_to_CSR(matrix_COO* mtx_coo, matrix_CSR* mtx_csr) {
+	_COO_to_CSR(mtx_coo->N, mtx_coo->M, mtx_coo->nz, mtx_coo->val, mtx_coo->I, mtx_coo->J,
+		&mtx_csr->row_id, &mtx_csr->col, &mtx_csr->value);
+	mtx_csr->N = mtx_coo->N;
+	mtx_csr->M = mtx_coo->M;
+}
+
+void _COO_to_CSR(int N, int M, int nz, double* val, int* I, int* J, int** _row_id, int** _col, double** _value) {
 	int* row_id = (int*)malloc((N + 1) * sizeof(int));
 	int* col = (int*)malloc(nz * sizeof(int));
 	double* value = (double*)malloc(nz * sizeof(double));
@@ -73,4 +85,24 @@ void create_transposed(int N, int M, int* row_id, int* col, double* value,
 	*_row_id_T = row_id_T;
 	*_col_T = col_T;
 	*_value_T = value_T;
+}
+
+void transpose_this(int* N, int* M, int** row_id, int** col, double** value) {
+	int N_T, M_T;
+	int* row_id_T;
+	int* col_T;
+	double* value_T;
+	create_transposed(*N, *M, *row_id, *col, *value, &N_T, &M_T, &row_id_T, &col_T, &value_T);
+	delete_CSR(row_id, col, value);
+	*N = N_T;
+	*M = M_T;
+	*row_id = row_id_T;
+	*col = col_T;
+	*value = value_T;
+}
+
+void matrix_addition(int N1, int M1, int* row_id1, int* col1, double* value1,
+	int N2, int M2, int* row_id2, int* col2, double* value2,
+	int* N, int* M, int** row_id, int** col, double** value) {
+	
 }
