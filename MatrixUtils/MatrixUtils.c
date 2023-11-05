@@ -108,5 +108,109 @@ void transpose_this(matrix_CSR* mtx) {
 }
 
 void matrix_addition(matrix_CSR* mtx1, matrix_CSR* mtx2, matrix_CSR* res) {
-	
+	int nz = 0;
+	int N = mtx1->N > mtx2->N ? mtx1->N : mtx2->N;
+	int M = mtx1->M > mtx2->M ? mtx1->M : mtx2->M;
+	int* row_id = (int*)malloc((N + 1) * sizeof(int));
+	int* col;
+	double* value;
+	int i = 0;
+	int pr = 0;
+	memset(row_id, 0, (N + 1) * sizeof(int));
+	for (; i < mtx1->N && i < mtx2->N; ++i) {
+		int a1 = mtx1->row_id[i], b1 = mtx1->row_id[i + 1];
+		int a2 = mtx2->row_id[i], b2 = mtx2->row_id[i + 1];
+		while (a1 != b1 && a2 != b2) {
+			if (mtx1->col[a1] < mtx2->col[a2]) {
+				++row_id[i + 1]; ++a1;
+			}
+			else if (mtx1->col[a1] > mtx2->col[a2]) {
+				++row_id[i + 1]; ++a2;
+			}
+			else { // mtx1->col[a1] == mtx2->col[a2]
+				++row_id[i + 1]; ++a1; ++a2;
+			}
+		}
+		row_id[i + 1] += b1 - a1;
+		row_id[i + 1] += b2 - a2;
+	}
+	for (; i < mtx1->N; ++i) {
+		int a1 = mtx1->row_id[i], b1 = mtx1->row_id[i + 1];
+		row_id[i + 1] += b1 - a1;
+	}
+	for (; i < mtx2->N; ++i) {
+		int a2 = mtx2->row_id[i], b2 = mtx2->row_id[i + 1];
+		row_id[i + 1] += b2 - a2;
+	}
+	for (int i = 1; i < N + 1; ++i) {
+		nz += pr;
+		pr = row_id[i];
+		row_id[i] = nz;
+	}
+	nz += pr;
+	col = (int*)malloc(nz * sizeof(int));
+	value = (double*)malloc(nz * sizeof(double));
+	i = 0;
+	for (; i < mtx1->N && i < mtx2->N; ++i) {
+		int a1 = mtx1->row_id[i], b1 = mtx1->row_id[i + 1];
+		int a2 = mtx2->row_id[i], b2 = mtx2->row_id[i + 1];
+		while (a1 != b1 && a2 != b2) {
+			int Index = row_id[i + 1];
+			if (mtx1->col[a1] < mtx2->col[a2]) {
+				col[Index] = mtx1->col[a1];
+				value[Index] = mtx1->value[a1];
+				++a1;
+			}
+			else if (mtx1->col[a1] > mtx2->col[a2]) {
+				col[Index] = mtx2->col[a2];
+				value[Index] = mtx2->value[a2];
+				++a2;
+			}
+			else { // mtx1->col[a1] == mtx2->col[a2]
+				col[Index] = mtx1->col[a1];
+				value[Index] = mtx1->value[a1] + mtx2->value[a2];
+				++a1; ++a2;
+			}
+			++row_id[i + 1];
+		}
+		while (a1 != b1) {
+			int Index = row_id[i + 1];
+			col[Index] = mtx1->col[a1];
+			value[Index] = mtx1->value[a1];
+			++a1;
+			++row_id[i + 1];
+		}
+		while (a2 != b2) {
+			int Index = row_id[i + 1];
+			col[Index] = mtx2->col[a2];
+			value[Index] = mtx2->value[a2];
+			++a2;
+			++row_id[i + 1];
+		}
+	}
+	for (; i < mtx1->N; ++i) {
+		int a1 = mtx1->row_id[i], b1 = mtx1->row_id[i + 1];
+		while (a1 != b1) {
+			int Index = row_id[i + 1];
+			col[Index] = mtx1->col[a1];
+			value[Index] = mtx1->value[a1];
+			++a1;
+			++row_id[i + 1];
+		}
+	}
+	for (; i < mtx2->N; ++i) {
+		int a2 = mtx2->row_id[i], b2 = mtx2->row_id[i + 1];
+		while (a2 != b2) {
+			int Index = row_id[i + 1];
+			col[Index] = mtx2->col[a2];
+			value[Index] = mtx2->value[a2];
+			++a2;
+			++row_id[i + 1];
+		}
+	}
+	res->N = N;
+	res->M = M;
+	res->row_id = row_id;
+	res->col = col;
+	res->value = value;
 }

@@ -402,6 +402,8 @@ FodyWeavers.xsd
 *.mtx
 # Small matrix for tests
 !littlematrix.mtx
+!add1.mtx
+!add2.mtx
 # Directory for solution
 sln/
 # Binary files

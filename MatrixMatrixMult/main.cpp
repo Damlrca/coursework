@@ -52,6 +52,25 @@ void print_COO_as_dense(const matrix_COO& mtx, const char* mtx_name) {
 	print_dense(dense);
 }
 
+void print_CSR(const matrix_CSR& mtx) {
+	int N = mtx.N;
+	int M = mtx.M;
+	int nz = mtx.row_id[N];
+	cout << N << " " << M << " " << nz << endl;
+	for (int i = 0; i < N + 1; i++) {
+		cout << mtx.row_id[i] << " ";
+	}
+	cout << endl;
+	for (int i = 0; i < nz; i++) {
+		cout << mtx.col[i] << " ";
+	}
+	cout << endl;
+	for (int i = 0; i < nz; i++) {
+		cout << setw(5) << mtx.value[i] << " ";
+	}
+	cout << endl;
+}
+
 void print_CSR_as_dense(const matrix_CSR& mtx, const char* mtx_name) {
 	cout << mtx_name << endl;
 	cout << "N: " << mtx.N << ", M: " << mtx.M << ", nz: " << mtx.row_id[mtx.N] << endl;
@@ -68,7 +87,6 @@ void print_CSR_as_dense(const matrix_CSR& mtx, const char* mtx_name) {
 }
 
 void few_tests() {
-	cout << fixed; cout.precision(2);
 	// small matrix 7x5 for tests
 	const char* file_bin = "D:\\source\\coursework\\testmatrices\\littlematrix.bin";
 	const char* file_mtx = "D:\\source\\coursework\\testmatrices\\littlematrix.mtx";
@@ -108,7 +126,57 @@ void few_tests() {
 	delete_CSR(&mtx4);
 };
 
+void test_addition() {
+	const char* file1 = "D:\\source\\coursework\\testmatrices\\add1.mtx";
+	const char* file2 = "D:\\source\\coursework\\testmatrices\\add2.mtx";
+	
+	matrix_COO add1_COO;
+	read_matrix_MTX(file1, &add1_COO);
+	print_COO_as_dense(add1_COO, "read add1 matrix");
+	cout << "----------------------" << endl;
+
+	matrix_COO add2_COO;
+	read_matrix_MTX(file2, &add2_COO);
+	print_COO_as_dense(add2_COO, "read add2 matrix");
+	cout << "----------------------" << endl;
+
+	matrix_CSR add1;
+	COO_to_CSR(&add1_COO, &add1);
+	
+	cout << "add1 in CSR format" << endl;
+	print_CSR(add1);
+	cout << "----------------------" << endl;
+	transpose_this(&add1);
+	transpose_this(&add1);
+	cout << "add1 in ORDERED CSR format" << endl;
+	print_CSR(add1);
+	cout << "----------------------" << endl;
+
+	matrix_CSR add2;
+	COO_to_CSR(&add2_COO, &add2);
+	cout << "add2 in CSR format" << endl;
+	print_CSR(add2);
+	cout << "----------------------" << endl;
+	transpose_this(&add2);
+	transpose_this(&add2);
+	cout << "add2 in ORDERED CSR format" << endl;
+	print_CSR(add2);
+	cout << "----------------------" << endl;
+
+	matrix_CSR res;
+	matrix_addition(&add1, &add2, &res);
+	print_CSR_as_dense(res, "result");
+	cout << "----------------------" << endl;
+
+	delete_COO(&add1_COO);
+	delete_COO(&add2_COO);
+	delete_CSR(&add1);
+	delete_CSR(&add2);
+	delete_CSR(&res);
+}
+
 void few_more_tests() {
+	/*
 	// read mtx matrix
 	cout << "read " << filename_mtx << endl;
 	MyTimer::SetStartTime();
@@ -123,7 +191,8 @@ void few_more_tests() {
 	MyTimer::PrintDifference();
 	cout << endl;
 	cout << "----------------------" << endl;
-
+	delete_COO(&mtx1);
+	*/
 	// read bin matrix
 	cout << "read " << filename_bin << endl;
 	MyTimer::SetStartTime();
@@ -151,15 +220,29 @@ void few_more_tests() {
 	cout << endl;
 	cout << "----------------------" << endl;
 
-	delete_COO(&mtx1);
+	// double transpose
+	MyTimer::SetStartTime();
+	transpose_this(&mtx3);
+	transpose_this(&mtx3);
+	MyTimer::SetEndTime();
+	cout << "N :" << mtx3.N << ", M: " << mtx3.M << ", nz: " << mtx3.row_id[mtx3.N] << endl;
+	cout << "matrix doudle transposed succsessfully in ";
+	MyTimer::PrintDifference();
+	cout << endl;
+	cout << "----------------------" << endl;
+
 	delete_COO(&mtx2);
 	delete_CSR(&mtx3);
 }
 
 int main() {
+	cout << fixed; cout.precision(2);
 	cout << "Testing main functions" << endl;
 	cout << "----------------------" << endl;
 	few_tests();
+	cout << "Testing addition" << endl;
+	cout << "----------------------" << endl;
+	test_addition();
 	cout << "Testing some functions with larger matrices" << endl;
 	cout << "----------------------" << endl;
 	few_more_tests();
