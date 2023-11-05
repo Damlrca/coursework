@@ -21,6 +21,14 @@ void delete_CSR(matrix_CSR* mtx) {
 	free(mtx->col); mtx->col = NULL;
 }
 
+void move_CSR(matrix_CSR* from, matrix_CSR* to) {
+	to->N = from->N; from->N = 0;
+	to->M = from->M; from->M = 0;
+	to->row_id = from->row_id; from->row_id = NULL;
+	to->col = from->col; from->col = NULL;
+	to->value = from->value; from->value = NULL;
+}
+
 void COO_to_CSR(matrix_COO* mtx_coo, matrix_CSR* mtx_csr) {
 	_COO_to_CSR(mtx_coo->N, mtx_coo->M, mtx_coo->nz, mtx_coo->val, mtx_coo->I, mtx_coo->J,
 		&mtx_csr->row_id, &mtx_csr->col, &mtx_csr->value);
@@ -53,7 +61,12 @@ void _COO_to_CSR(int N, int M, int nz, double* val, int* I, int* J, int** _row_i
 	*_value = value;
 }
 
-void create_transposed(int N, int M, int* row_id, int* col, double* value,
+void create_transposed(matrix_CSR* from, matrix_CSR* to) {
+	_create_transposed(from->N, from->M, from->row_id, from->col, from->value,
+		&to->N, &to->M, &to->row_id, &to->col, &to->value);
+}
+
+void _create_transposed(int N, int M, int* row_id, int* col, double* value,
 	int* N_T, int* M_T, int** _row_id_T, int** _col_T, double** _value_T) {
 	int nz = row_id[N];
 	*N_T = M;
@@ -87,22 +100,13 @@ void create_transposed(int N, int M, int* row_id, int* col, double* value,
 	*_value_T = value_T;
 }
 
-void transpose_this(int* N, int* M, int** row_id, int** col, double** value) {
-	int N_T, M_T;
-	int* row_id_T;
-	int* col_T;
-	double* value_T;
-	create_transposed(*N, *M, *row_id, *col, *value, &N_T, &M_T, &row_id_T, &col_T, &value_T);
-	delete_CSR(row_id, col, value);
-	*N = N_T;
-	*M = M_T;
-	*row_id = row_id_T;
-	*col = col_T;
-	*value = value_T;
+void transpose_this(matrix_CSR* mtx) {
+	matrix_CSR res;
+	create_transposed(mtx, &res);
+	delete_CSR(mtx);
+	move_CSR(&res, mtx);
 }
 
-void matrix_addition(int N1, int M1, int* row_id1, int* col1, double* value1,
-	int N2, int M2, int* row_id2, int* col2, double* value2,
-	int* N, int* M, int** row_id, int** col, double** value) {
+void matrix_addition(matrix_CSR* mtx1, matrix_CSR* mtx2, matrix_CSR* res) {
 	
 }
