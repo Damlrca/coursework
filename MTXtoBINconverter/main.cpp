@@ -8,8 +8,8 @@ using namespace std::chrono;
 using myclock = chrono::system_clock;
 myclock::time_point start_time, end_time;
 
-const char* filename_in = "D:\\source\\coursework\\testmatrices\\littlematrix.mtx";
-const char* filename_out = "D:\\source\\coursework\\testmatrices\\littlematrix.bin";
+const char* filename_in = "D:\\source\\coursework\\sample_matrices\\littlematrix.mtx";
+const char* filename_out = "D:\\source\\coursework\\sample_matrices\\littlematrix.bin";
 
 int main() {
 	// read MTX matrix

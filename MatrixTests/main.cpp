@@ -15,9 +15,6 @@ using namespace std;
 
 constexpr double EPS = 1e-8;
 
-const char* filename_mtx = "D:\\source\\coursework\\Freescale1.mtx";
-const char* filename_bin = "D:\\source\\coursework\\Freescale1.bin";
-
 class MyTimer {
 	using myclock = std::chrono::system_clock;
 	static myclock::time_point start_time;
@@ -117,8 +114,8 @@ bool matrix_compare(matrix_CSR* mtx1, matrix_CSR* mtx2) {
 
 void few_tests() {
 	// small matrix 7x5 for tests
-	const char* file_bin = "D:\\source\\coursework\\testmatrices\\littlematrix.bin";
-	const char* file_mtx = "D:\\source\\coursework\\testmatrices\\littlematrix.mtx";
+	const char* file_bin = "D:\\source\\coursework\\sample_matrices\\littlematrix.bin";
+	const char* file_mtx = "D:\\source\\coursework\\sample_matrices\\littlematrix.mtx";
 
 	// COO MTX (mtx1)
 	matrix_COO mtx1;
@@ -156,8 +153,8 @@ void few_tests() {
 };
 
 void test_addition() {
-	const char* file1 = "D:\\source\\coursework\\testmatrices\\add1.mtx";
-	const char* file2 = "D:\\source\\coursework\\testmatrices\\add2.mtx";
+	const char* file1 = "D:\\source\\coursework\\sample_matrices\\add1.mtx";
+	const char* file2 = "D:\\source\\coursework\\sample_matrices\\add2.mtx";
 	
 	matrix_COO add1_COO;
 	read_matrix_MTX(file1, &add1_COO);
@@ -205,6 +202,9 @@ void test_addition() {
 }
 
 void few_more_tests() {
+	const char* filename_mtx = "D:\\source\\coursework\\sample_matrices\\Freescale1.mtx";
+	const char* filename_bin = "D:\\source\\coursework\\sample_matrices\\Freescale1.bin";
+
 	// read mtx matrix
 	matrix_COO mtx1;
 	cout << "(mtx1) read " << filename_mtx << endl;

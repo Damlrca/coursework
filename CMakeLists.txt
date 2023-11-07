@@ -4,5 +4,6 @@ project(coursework)
 
 add_subdirectory(MatrixIO)
 add_subdirectory(MatrixUtils)
-add_subdirectory(MatrixMatrixMult)
 add_subdirectory(MTXtoBINconverter)
+add_subdirectory(MatrixGenerator)
+add_subdirectory(MatrixTests)
