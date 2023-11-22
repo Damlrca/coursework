@@ -1,48 +1,63 @@
 ## coursework repo
 
-Умножение разреженных матриц
+Умножение разреженных матриц!
 
-#### MatrixMult
+#### MatrixMult (C, library)
 
 Несколько функций умножения разреженных матриц
 
-#### MatrixMultTests
+#### MatrixMultTests (Cpp, executable)
 
 Тестирование функций из **MatrixMult**
 
-#### MatrixTests
+#### MatrixTests (Cpp, executable)
 
-Тестирование различных функций из **MatrixUtils** и **MatrixIO**
+Тестирование различных функций из **MatrixUtils**, **MatrixIO**, **OtherUtils**
 
-#### MatrixUtils
+#### MatrixUtils (C, library)
 
-Стуктуры и функции, необходимые для работы с разреженными матрицами
+Структуры и функции, необходимые для работы с разреженными матрицами
 
-- matrix_COO // structure for matrix in COO format
-- matrix_CSR // structure for matrix in CSR format
-- void delete_COO(matrix_COO* mtx) // delete matrix in COO format
-- void delete_CSR(matrix_CSR* mtx) // delete matrix in CSR format
-- void move_CSR(matrix_CSR* from, matrix_CSR* to) // move one matrix in CSR format from one object to another
-- void COO_to_CSR(matrix_COO* mtx_coo, matrix_CSR* mtx_csr) // convert COO to CSR
-- void create_transposed(matrix_CSR* from, matrix_CSR* to) // create transposed matrix in CSR format from matrix in CSR format
-- void transpose_this(matrix_CSR* mtx) // transpose this matrix in CSR format
-- void matrix_addition(matrix_CSR* mtx1, matrix_CSR* mtx2, matrix_CSR* res) // addition of two ORDERED!!! CSR matrices
+- **matrix_COO** : structure for sparse matrix in COO format
+- **matrix_CSR** : structure for sparse matrix in CSR format
+- void **delete_COO**(matrix_COO\* mtx) : delete contents of COO-matrix
+- void **delete_CSR**(matrix_CSR\* mtx) : delete contents of CSR-matrix
+- void **move_CSR**(matrix_CSR\* from, matrix_CSR\* to) : move contents of one CSR-matrix to another
+- void **convert_COO_to_CSR**(matrix_COO\* mtx_coo, matrix_CSR\* mtx_csr) : convert COO-matrix into CSR-matrix
+- void **create_transposed_CSR**(matrix_CSR\* from, matrix_CSR\* to) : create transposed CSR-matrix from CSR-matrix
+- void **transpose_this_CSR**(matrix_CSR\* mtx) : transpose this CSR-matrix
+- void **matrix_addition**(matrix_CSR\* mtx1, matrix_CSR\* mtx2, matrix_CSR\* res) : addition of two CSR-matrices
 
-#### MatrixIO
+#### MatrixIO (C, library)
 
 Функции для чтения и сохранения разреженных матриц в форматах MTX и BIN
 
-- int read_matrix_MTX(const char* fname, matrix_COO* mtx) // read unsymmetric or symmetrix mtx matrix from file to COO format
-- int read_matrix_BIN(const char* fname, matrix_COO* mtx) // read matrix from BIN file to COO format
-- int save_matrix_BIN(const char* fname, matrix_COO* mtx) // save matrix in COO format to BIN file
+- int **read_matrix_MTX**(const char\* fname, matrix_COO\* mtx) : read unsymmetric or symmetrix matrix from mtx file to COO-matrix
+- int **read_matrix_BIN**(const char\* fname, matrix_COO\* mtx) : read matrix from BIN file to COO-matrix
+- int **save_matrix_BIN**(const char\* fname, matrix_COO\* mtx) : save COO-matrix to BIN file
 
-#### MatrixGenerator
+#### MatrixGenerator (Cpp, ?)
 
 Генерация матриц для тестов
 
-#### OtherUtils
+#### OtherUtils (Cpp, library)
 
-Другие полезные утилиты
+Другие полезные классы и функции
+
+- **MyTimer** : class for measuring time
+	- static void **MyTimer::SetStartTime**() : sets start time of measurment
+	- static void **MyTimer::SetEndTime**() : sets end time of measurment
+	- static long long **GetDifferenceMs**() : get difference between start and end time in milliseconds
+- void **print_dense**(std::vector<std::vector<double>>& dense) : print dense matrix
+- void **print_COO_as_dense**(const matrix_COO& mtx, const char\* mtx_name) : print COO-matrix as dense matrix
+- void **print_CSR**(const matrix_CSR& mtx) : print CSR-matrix in CSR format
+- void **print_CSR_as_dense**(const matrix_CSR& mtx, const char\* mtx_name) : print CSR-matrix as dense matrix
+- void **matrix_difference**(matrix_CSR\* mtx1, matrix_CSR\* mtx2, matrix_CSR\* res) : difference of two CSR-matrices
+- bool **matrix_compare**(matrix_CSR\* mtx1, matrix_CSR\* mtx2) : returns true if matrices "mtx1" and "mtx2" are equal
+
+#### MTXtoBINconverter (Cpp, executable)
+
+Создание файла матрицы в BIN формате на основе MTX-файла
 
 #### sample_matrices
 

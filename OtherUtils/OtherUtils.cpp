@@ -5,6 +5,8 @@ using namespace std;
 MyTimer::myclock::time_point MyTimer::start_time;
 MyTimer::myclock::time_point MyTimer::end_time;
 
+constexpr double EPS = 1e-8;
+
 void print_dense(vector<vector<double>>& dense) {
 	for (int i = 0; i < dense.size(); i++) {
 		for (int j = 0; j < dense[i].size(); j++)
@@ -65,4 +67,19 @@ void matrix_difference(matrix_CSR* mtx1, matrix_CSR* mtx2, matrix_CSR* res) {
 	matrix_addition(mtx1, mtx2, res);
 	for (int i = 0; i < nz; i++)
 		mtx2->value[i] = -mtx2->value[i];
+}
+
+bool matrix_compare(matrix_CSR* mtx1, matrix_CSR* mtx2) {
+	if (mtx1->N != mtx2->N || mtx1->M != mtx2->M)
+		return false;
+	matrix_CSR res;
+	matrix_difference(mtx1, mtx2, &res);
+	double mxdiff = 0;
+	int nz = res.row_id[res.N];
+	for (int i = 0; i < nz; i++) {
+		if (abs(res.value[i]) > abs(mxdiff))
+			mxdiff = res.value[i];
+	}
+	delete_CSR(&res);
+	return abs(mxdiff) < EPS;
 }

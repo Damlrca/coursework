@@ -29,14 +29,14 @@ void move_CSR(matrix_CSR* from, matrix_CSR* to) {
 	to->value = from->value; from->value = NULL;
 }
 
-void COO_to_CSR(matrix_COO* mtx_coo, matrix_CSR* mtx_csr) {
-	_COO_to_CSR(mtx_coo->N, mtx_coo->M, mtx_coo->nz, mtx_coo->val, mtx_coo->I, mtx_coo->J,
+void convert_COO_to_CSR(matrix_COO* mtx_coo, matrix_CSR* mtx_csr) {
+	_convert_COO_to_CSR(mtx_coo->N, mtx_coo->M, mtx_coo->nz, mtx_coo->val, mtx_coo->I, mtx_coo->J,
 		&mtx_csr->row_id, &mtx_csr->col, &mtx_csr->value);
 	mtx_csr->N = mtx_coo->N;
 	mtx_csr->M = mtx_coo->M;
 }
 
-void _COO_to_CSR(int N, int M, int nz, double* val, int* I, int* J, int** _row_id, int** _col, double** _value) {
+void _convert_COO_to_CSR(int N, int M, int nz, double* val, int* I, int* J, int** _row_id, int** _col, double** _value) {
 	int* row_id = (int*)malloc((N + 1) * sizeof(int));
 	int* col = (int*)malloc(nz * sizeof(int));
 	double* value = (double*)malloc(nz * sizeof(double));
@@ -61,12 +61,12 @@ void _COO_to_CSR(int N, int M, int nz, double* val, int* I, int* J, int** _row_i
 	*_value = value;
 }
 
-void create_transposed(matrix_CSR* from, matrix_CSR* to) {
-	_create_transposed(from->N, from->M, from->row_id, from->col, from->value,
+void create_transposed_CSR(matrix_CSR* from, matrix_CSR* to) {
+	_create_transposed_CSR(from->N, from->M, from->row_id, from->col, from->value,
 		&to->N, &to->M, &to->row_id, &to->col, &to->value);
 }
 
-void _create_transposed(int N, int M, int* row_id, int* col, double* value,
+void _create_transposed_CSR(int N, int M, int* row_id, int* col, double* value,
 	int* N_T, int* M_T, int** _row_id_T, int** _col_T, double** _value_T) {
 	int nz = row_id[N];
 	*N_T = M;
@@ -100,9 +100,9 @@ void _create_transposed(int N, int M, int* row_id, int* col, double* value,
 	*_value_T = value_T;
 }
 
-void transpose_this(matrix_CSR* mtx) {
+void transpose_this_CSR(matrix_CSR* mtx) {
 	matrix_CSR res;
-	create_transposed(mtx, &res);
+	create_transposed_CSR(mtx, &res);
 	delete_CSR(mtx);
 	move_CSR(&res, mtx);
 }
