@@ -3,6 +3,7 @@ extern "C" {
 #include "MatrixIO.h"
 #include "MatrixMultMKL.h"
 }
+#include "MatrixMult.h"
 #include "OtherUtils.hpp"
 #include <iostream>
 
@@ -49,5 +50,36 @@ int main() {
 	//delete_CSR(&matrB_CSR);
 	//delete_CSR(&matrC_CSR);
 	// how destoy correct ?
+
+	/*
+	matrix_CSR matrC_CSR_naive;
+	cout << "C_naive = A * B" << endl;
+	MyTimer::SetStartTime();
+	status = matrix_mult_naive(&matrA_CSR, &matrB_CSR, &matrC_CSR_naive);
+	if (status != 0) {
+		cout << "matrix_mult_naive failed" << endl;
+		return -1;
+	}
+	MyTimer::SetEndTime();
+	cout << "matrix multiplied using \"matrix_mult_naive\" succesfully in " << MyTimer::GetDifferenceMs() << "ms" << endl;
+
+	cout << "Matrix C_naive:" << endl;
+	cout << "N: " << matrC_CSR_naive.N << ", M: " << matrC_CSR_naive.M << ", nz: " << matrC_CSR_naive.row_id[matrC_CSR_naive.N] << endl;
+	*/
+
+	matrix_CSR matrC_CSR_naive_2;
+	cout << "C_naive_2 = A * B" << endl;
+	MyTimer::SetStartTime();
+	status = matrix_mult_naive_2(&matrA_CSR, &matrB_CSR, &matrC_CSR_naive_2);
+	if (status != 0) {
+		cout << "matrix_mult_naive failed" << endl;
+		return -1;
+	}
+	MyTimer::SetEndTime();
+	cout << "matrix multiplied using \"matrix_mult_naive\" succesfully in " << MyTimer::GetDifferenceMs() << "ms" << endl;
+
+	cout << "Matrix C_naive:" << endl;
+	cout << "N: " << matrC_CSR_naive_2.N << ", M: " << matrC_CSR_naive_2.M << ", nz: " << matrC_CSR_naive_2.row_id[matrC_CSR_naive_2.N] << endl;
+
 	return 0;
 }
