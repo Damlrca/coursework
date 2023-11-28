@@ -51,7 +51,8 @@ int main() {
 	//delete_CSR(&matrC_CSR);
 	// how destoy correct ?
 
-	/*
+	transpose_this_CSR(&matrB_CSR); // !!! transpose matrix B !!!
+
 	matrix_CSR matrC_CSR_naive;
 	cout << "C_naive = A * B" << endl;
 	MyTimer::SetStartTime();
@@ -65,7 +66,21 @@ int main() {
 
 	cout << "Matrix C_naive:" << endl;
 	cout << "N: " << matrC_CSR_naive.N << ", M: " << matrC_CSR_naive.M << ", nz: " << matrC_CSR_naive.row_id[matrC_CSR_naive.N] << endl;
-	*/
+	
+	matrix_CSR matrC_CSR_copy;
+	create_transposed_CSR(&matrC_CSR, &matrC_CSR_copy);
+	transpose_this_CSR(&matrC_CSR_copy);
+	transpose_this_CSR(&matrC_CSR_naive);
+	transpose_this_CSR(&matrC_CSR_naive);
+	if (matrix_compare(&matrC_CSR_copy, &matrC_CSR_naive)) {
+		cout << "(!!!) matrC_CSR and matrC_CSR_naive are equal" << endl;
+	}
+	else {
+		cout << "(!!!) Error: matrC_CSR != matrC_CSR_naive" << endl;
+	}
+
+	transpose_this_CSR(&matrA_CSR); // !!! matrA_CSR shoul be sorted !!! (matrB_CSR is already transposed and sorted)
+	transpose_this_CSR(&matrA_CSR);
 
 	matrix_CSR matrC_CSR_naive_2;
 	cout << "C_naive_2 = A * B" << endl;
@@ -76,10 +91,19 @@ int main() {
 		return -1;
 	}
 	MyTimer::SetEndTime();
-	cout << "matrix multiplied using \"matrix_mult_naive\" succesfully in " << MyTimer::GetDifferenceMs() << "ms" << endl;
+	cout << "matrix multiplied using \"matrix_mult_naive_2\" succesfully in " << MyTimer::GetDifferenceMs() << "ms" << endl;
 
 	cout << "Matrix C_naive:" << endl;
 	cout << "N: " << matrC_CSR_naive_2.N << ", M: " << matrC_CSR_naive_2.M << ", nz: " << matrC_CSR_naive_2.row_id[matrC_CSR_naive_2.N] << endl;
+
+	transpose_this_CSR(&matrC_CSR_naive_2);
+	transpose_this_CSR(&matrC_CSR_naive_2);
+	if (matrix_compare(&matrC_CSR_copy, &matrC_CSR_naive_2)) {
+		cout << "(!!!) matrC_CSR and matrC_CSR_naive_2 are equal" << endl;
+	}
+	else {
+		cout << "(!!!) Error: matrC_CSR != matrC_CSR_naive_2" << endl;
+	}
 
 	return 0;
 }
