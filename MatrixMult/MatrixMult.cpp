@@ -13,7 +13,7 @@ int matrix_mult_naive(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr)
 		for (int j = 0; j < N; j++) {
 			double t = 0.0;
 			for (int k = A_csr->row_id[i]; k < A_csr->row_id[i + 1]; k++) {
-				for (int l = B_csr->row_id[j]; l < B_csr->row_id[i + 1]; l++) {
+				for (int l = B_csr->row_id[j]; l < B_csr->row_id[j + 1]; l++) {
 					if (A_csr->col[k] == B_csr->col[l]) {
 						t += A_csr->value[k] * B_csr->value[l];
 					}
@@ -47,7 +47,8 @@ int matrix_mult_naive_2(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_cs
 	for (int i = 0; i < N; i++) {
 		for (int j = 0; j < N; j++) {
 			double t = 0.0;
-			for (int k = A_csr->row_id[i], l = B_csr->row_id[j]; k < A_csr->row_id[i + 1] && l < B_csr->row_id[i + 1];) {
+			bool flag = false;
+			for (int k = A_csr->row_id[i], l = B_csr->row_id[j]; k < A_csr->row_id[i + 1] && l < B_csr->row_id[j + 1];) {
 				if (A_csr->col[k] < B_csr->col[l]) {
 					k++;
 				}
@@ -58,9 +59,11 @@ int matrix_mult_naive_2(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_cs
 					t += A_csr->value[k] * B_csr->value[l];
 					k++;
 					l++;
+					flag = true;
 				}
 			}
-			if (t != 0) {
+			//if (t != 0) {
+			if (flag) {
 				row.push_back(i);
 				col.push_back(j);
 				val.push_back(t);
