@@ -122,7 +122,7 @@ void few_more_tests() {
 		exit(-1);
 	};
 	MyTimer::SetEndTime();
-	cout << "N :" << mtx1.N << ", M: " << mtx1.M << ", nz: " << mtx1.nz << endl;
+	cout << "N: " << mtx1.N << ", M: " << mtx1.M << ", nz: " << mtx1.nz << endl;
 	cout << "matrix read successfully in " << MyTimer::GetDifferenceMs() << "ms" << endl;
 	cout << "----------------------" << endl;
 	
@@ -135,7 +135,7 @@ void few_more_tests() {
 		exit(-1);
 	};
 	MyTimer::SetEndTime();
-	cout << "N :" << mtx2.N << ", M: " << mtx2.M << ", nz: " << mtx2.nz << endl;
+	cout << "N: " << mtx2.N << ", M: " << mtx2.M << ", nz: " << mtx2.nz << endl;
 	cout << "matrix read successfully in " << MyTimer::GetDifferenceMs() << "ms" << endl;
 	cout << "----------------------" << endl;
 
@@ -145,7 +145,7 @@ void few_more_tests() {
 	MyTimer::SetStartTime();
 	convert_COO_to_CSR(&mtx1, &mtx3);
 	MyTimer::SetEndTime();
-	cout << "N :" << mtx3.N << ", M: " << mtx3.M << ", nz: " << mtx3.row_id[mtx3.N] << endl;
+	cout << "N: " << mtx3.N << ", M: " << mtx3.M << ", nz: " << mtx3.row_id[mtx3.N] << endl;
 	cout << "matrix converted successfully in " << MyTimer::GetDifferenceMs() << "ms" << endl;
 	cout << "----------------------" << endl;
 
@@ -155,7 +155,7 @@ void few_more_tests() {
 	MyTimer::SetStartTime();
 	convert_COO_to_CSR(&mtx2, &mtx4);
 	MyTimer::SetEndTime();
-	cout << "N :" << mtx4.N << ", M: " << mtx4.M << ", nz: " << mtx4.row_id[mtx4.N] << endl;
+	cout << "N: " << mtx4.N << ", M: " << mtx4.M << ", nz: " << mtx4.row_id[mtx4.N] << endl;
 	cout << "matrix converted successfully in " << MyTimer::GetDifferenceMs() << "ms" << endl;
 	cout << "----------------------" << endl;
 
@@ -183,7 +183,7 @@ void few_more_tests() {
 	transpose_this_CSR(&mtx4);
 	transpose_this_CSR(&mtx4);
 	MyTimer::SetEndTime();
-	cout << "N :" << mtx4.N << ", M: " << mtx4.M << ", nz: " << mtx4.row_id[mtx4.N] << endl;
+	cout << "N: " << mtx4.N << ", M: " << mtx4.M << ", nz: " << mtx4.row_id[mtx4.N] << endl;
 	cout << "matrix double transposed successfully in " << MyTimer::GetDifferenceMs() << "ms" << endl;
 	cout << "----------------------" << endl;
 

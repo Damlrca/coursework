@@ -6,9 +6,15 @@
 
 Несколько функций умножения разреженных матриц
 
+#### MatrixMultMKL (C, library)
+
+Функция умножения разреженных матриц с использованием функции из oneMKL
+
+- int **matrix_mult_mkl**(matrix_CSR\* A_csr, matrix_CSR\* B_csr, matrix_CSR\* res_csr);
+
 #### MatrixMultTests (Cpp, executable)
 
-Тестирование функций из **MatrixMult**
+Тестирование функций из **MatrixMult**, **MatrixMultMKL**
 
 #### MatrixTests (Cpp, executable)
 
