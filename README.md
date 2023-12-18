@@ -42,9 +42,12 @@
 - int **read_matrix_BIN**(const char\* fname, matrix_COO\* mtx) : read matrix from BIN file to COO-matrix
 - int **save_matrix_BIN**(const char\* fname, matrix_COO\* mtx) : save COO-matrix to BIN file
 
-#### MatrixGenerator (Cpp, ?)
+#### MatrixGenerator (Cpp, library)
 
 Генерация матриц для тестов
+
+- void **generate_uniform_square_sparse_matrix_CSR**(int size, int k, matrix_CSR& res) : генерация квадратной матрицы размером n\*n по k элеметов в каждой строке
+- void **generate_nonuniform_square_sparse_matrix_CSR**(int size, int k1, int k2, matrix_CSR& res) : генерация квадратной матрицы размером n\*n кол-во элементов в строках линейно от k1 до k2
 
 #### OtherUtils (Cpp, library)
 

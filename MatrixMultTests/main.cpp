@@ -3,6 +3,7 @@ extern "C" {
 #include "MatrixIO.h"
 #include "MatrixMultMKL.h"
 }
+#include "MatrixGenerator.hpp"
 #include "MatrixMult.h"
 #include "OtherUtils.hpp"
 #include <iostream>
@@ -10,22 +11,26 @@ extern "C" {
 using std::cout;
 using std::endl;
 
-const char* fileA = "D:\\source\\coursework\\sample_matrices\\multA.bin";
-const char* fileB = "D:\\source\\coursework\\sample_matrices\\multB.bin";
+//const char* fileA = "D:\\source\\coursework\\sample_matrices\\multA.bin";
+//const char* fileB = "D:\\source\\coursework\\sample_matrices\\multB.bin";
 
 int main() {
-	matrix_COO matrA_COO;
-	read_matrix_BIN(fileA, &matrA_COO);
-	matrix_COO matrB_COO;
-	read_matrix_BIN(fileB, &matrB_COO);
+	//matrix_COO matrA_COO;
+	//read_matrix_BIN(fileA, &matrA_COO);
+	//matrix_COO matrB_COO;
+	//read_matrix_BIN(fileB, &matrB_COO);
 	matrix_CSR matrA_CSR;
-	convert_COO_to_CSR(&matrA_COO, &matrA_CSR);
-	cout << "A (" << fileA << ")" << endl;
+	//convert_COO_to_CSR(&matrA_COO, &matrA_CSR);
+	//generate_uniform_square_sparse_matrix_CSR(20'000, 25, matrA_CSR);
+	generate_nonuniform_square_sparse_matrix_CSR(20'000, 0, 50, matrA_CSR);
+	//cout << "A (" << fileA << ")" << endl;
 	cout << "Matrix A:" << endl;
 	cout << "N: " << matrA_CSR.N << ", M: " << matrA_CSR.M << ", nz: " << matrA_CSR.row_id[matrA_CSR.N] << endl;
 	matrix_CSR matrB_CSR;
-	convert_COO_to_CSR(&matrB_COO, &matrB_CSR);
-	cout << "B (" << fileA << ")" << endl;
+	//convert_COO_to_CSR(&matrB_COO, &matrB_CSR);
+	//generate_uniform_square_sparse_matrix_CSR(20'000, 25, matrB_CSR);
+	generate_nonuniform_square_sparse_matrix_CSR(20'000, 0, 50, matrB_CSR);
+	//cout << "B (" << fileB << ")" << endl;
 	cout << "Matrix B:" << endl;
 	cout << "N: " << matrB_CSR.N << ", M: " << matrB_CSR.M << ", nz: " << matrB_CSR.row_id[matrB_CSR.N] << endl;
 

@@ -14,3 +14,6 @@ target_link_libraries(MatrixMultTests PUBLIC MatrixMultMKL)
 
 target_include_directories(MatrixMultTests PUBLIC ../OtherUtils)
 target_link_libraries(MatrixMultTests PUBLIC OtherUtils)
+
+target_include_directories(MatrixMultTests PUBLIC ../MatrixGenerator)
+target_link_libraries(MatrixMultTests PUBLIC MatrixGenerator)
