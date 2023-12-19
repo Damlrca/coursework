@@ -50,7 +50,7 @@ void basic_test(matrix_CSR& matrA_CSR, matrix_CSR& matrB_CSR) {
 	transpose_this_CSR(&matrA_CSR); // !!! matrA_CSR should be sorted
 	transpose_this_CSR(&matrA_CSR);
 	transpose_this_CSR(&matrB_CSR); // !!! transpose matrix B !!!
-	/*
+
 	// matrC_CSR_naive_1
 	for (int i = 0; i < 3; i++) {
 		matrix_CSR matrC_CSR_naive_1;
@@ -92,7 +92,7 @@ void basic_test(matrix_CSR& matrA_CSR, matrix_CSR& matrB_CSR) {
 		delete_CSR(&matrC_CSR_naive_3);
 	}
 	cout << endl;
-	*/
+	
 	// matrC_CSR_naive_1_naiveomp
 	for (int i = 0; i < 3; i++) {
 		matrix_CSR matrC_CSR_naive_1_naiveomp;
@@ -132,6 +132,48 @@ void basic_test(matrix_CSR& matrA_CSR, matrix_CSR& matrB_CSR) {
 		transpose_this_CSR(&matrC_CSR_naive_3_naiveomp);
 		comp_algo("matrC_CSR", "matrC_CSR_naive_3_naiveomp", matrC_CSR, matrC_CSR_naive_3_naiveomp);
 		delete_CSR(&matrC_CSR_naive_3_naiveomp);
+	}
+	cout << endl;
+
+	// matrC_CSR_naive_1_queueomp
+	for (int i = 0; i < 3; i++) {
+		matrix_CSR matrC_CSR_naive_1_queueomp;
+		//cout << "C_naive_1_queueomp = A * B" << endl;
+		test_algo("matrix_mult_naive_1_queueomp", matrix_mult_naive_1_queueomp, matrA_CSR, matrB_CSR, matrC_CSR_naive_1_queueomp);
+		//cout << "Matrix C_naive_1_queueomp: N: " << matrC_CSR_naive_1_queueomp.N << ", M: " << matrC_CSR_naive_1_queueomp.M << ", nz: " << matrC_CSR_naive_1_queueomp.row_id[matrC_CSR_naive_1_queueomp.N] << endl;
+
+		transpose_this_CSR(&matrC_CSR_naive_1_queueomp);
+		transpose_this_CSR(&matrC_CSR_naive_1_queueomp);
+		comp_algo("matrC_CSR", "matrC_CSR_naive_1_queueomp", matrC_CSR, matrC_CSR_naive_1_queueomp);
+		delete_CSR(&matrC_CSR_naive_1_queueomp);
+	}
+	cout << endl;
+
+	// matrC_CSR_naive_2_queueomp
+	for (int i = 0; i < 3; i++) {
+		matrix_CSR matrC_CSR_naive_2_queueomp;
+		//cout << "C_naive_2_queueomp = A * B" << endl;
+		test_algo("matrix_mult_naive_2_queueomp", matrix_mult_naive_2_queueomp, matrA_CSR, matrB_CSR, matrC_CSR_naive_2_queueomp);
+		//cout << "Matrix C_naive_2_queueomp: N: " << matrC_CSR_naive_2_queueomp.N << ", M: " << matrC_CSR_naive_2_queueomp.M << ", nz: " << matrC_CSR_naive_2_queueomp.row_id[matrC_CSR_naive_2_queueomp.N] << endl;
+
+		transpose_this_CSR(&matrC_CSR_naive_2_queueomp);
+		transpose_this_CSR(&matrC_CSR_naive_2_queueomp);
+		comp_algo("matrC_CSR", "matrC_CSR_naive_2_queueomp", matrC_CSR, matrC_CSR_naive_2_queueomp);
+		delete_CSR(&matrC_CSR_naive_2_queueomp);
+	}
+	cout << endl;
+
+	// matrC_CSR_naive_3_queueomp
+	for (int i = 0; i < 3; i++) {
+		matrix_CSR matrC_CSR_naive_3_queueomp;
+		//cout << "C_naive_3_queueomp = A * B" << endl;
+		test_algo("matrix_mult_naive_3_queueomp", matrix_mult_naive_3_queueomp, matrA_CSR, matrB_CSR, matrC_CSR_naive_3_queueomp);
+		//cout << "Matrix C_naive_3_queueomp: N: " << matrC_CSR_naive_3_queueomp.N << ", M: " << matrC_CSR_naive_3_queueomp.M << ", nz: " << matrC_CSR_naive_3_queueomp.row_id[matrC_CSR_naive_3_queueomp.N] << endl;
+
+		transpose_this_CSR(&matrC_CSR_naive_3_queueomp);
+		transpose_this_CSR(&matrC_CSR_naive_3_queueomp);
+		comp_algo("matrC_CSR", "matrC_CSR_naive_3_queueomp", matrC_CSR, matrC_CSR_naive_3_queueomp);
+		delete_CSR(&matrC_CSR_naive_3_queueomp);
 	}
 	cout << endl;
 
