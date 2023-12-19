@@ -47,26 +47,25 @@ void basic_test(matrix_CSR& matrA_CSR, matrix_CSR& matrB_CSR) {
 	transpose_this_CSR(&matrC_CSR);
 	cout << endl;
 
+	transpose_this_CSR(&matrA_CSR); // !!! matrA_CSR should be sorted
+	transpose_this_CSR(&matrA_CSR);
 	transpose_this_CSR(&matrB_CSR); // !!! transpose matrix B !!!
-
-	// matrC_CSR_naive
+	/*
+	// matrC_CSR_naive_1
 	for (int i = 0; i < 3; i++) {
-		matrix_CSR matrC_CSR_naive;
+		matrix_CSR matrC_CSR_naive_1;
 		//cout << "C_naive = A * B" << endl;
-		test_algo("matrix_mult_naive", matrix_mult_naive, matrA_CSR, matrB_CSR, matrC_CSR_naive);
-		//cout << "Matrix C_naive: N: " << matrC_CSR_naive.N << ", M: " << matrC_CSR_naive.M << ", nz: " << matrC_CSR_naive.row_id[matrC_CSR_naive.N] << endl;
+		test_algo("matrix_mult_naive_1", matrix_mult_naive_1, matrA_CSR, matrB_CSR, matrC_CSR_naive_1);
+		//cout << "Matrix C_naive_1: N: " << matrC_CSR_naive_1.N << ", M: " << matrC_CSR_naive_1.M << ", nz: " << matrC_CSR_naive_1.row_id[matrC_CSR_naive_1.N] << endl;
 
-		transpose_this_CSR(&matrC_CSR_naive);
-		transpose_this_CSR(&matrC_CSR_naive);
-		comp_algo("matrC_CSR", "matrC_CSR_naive", matrC_CSR, matrC_CSR_naive);
-		delete_CSR(&matrC_CSR_naive);
+		transpose_this_CSR(&matrC_CSR_naive_1);
+		transpose_this_CSR(&matrC_CSR_naive_1);
+		comp_algo("matrC_CSR", "matrC_CSR_naive_1", matrC_CSR, matrC_CSR_naive_1);
+		delete_CSR(&matrC_CSR_naive_1);
 	}
 	cout << endl;
 
 	// matrC_CSR_naive_2
-	transpose_this_CSR(&matrA_CSR); // !!! matrA_CSR should be sorted
-	transpose_this_CSR(&matrA_CSR);
-	// !!! (matrB_CSR is already transposed and sorted)
 	for (int i = 0; i < 3; i++) {
 		matrix_CSR matrC_CSR_naive_2;
 		//cout << "C_naive_2 = A * B" << endl;
@@ -91,6 +90,48 @@ void basic_test(matrix_CSR& matrA_CSR, matrix_CSR& matrB_CSR) {
 		transpose_this_CSR(&matrC_CSR_naive_3);
 		comp_algo("matrC_CSR", "matrC_CSR_naive_3", matrC_CSR, matrC_CSR_naive_3);
 		delete_CSR(&matrC_CSR_naive_3);
+	}
+	cout << endl;
+	*/
+	// matrC_CSR_naive_1_naiveomp
+	for (int i = 0; i < 3; i++) {
+		matrix_CSR matrC_CSR_naive_1_naiveomp;
+		//cout << "C_naive_1_naiveomp = A * B" << endl;
+		test_algo("matrix_mult_naive_1_naiveomp", matrix_mult_naive_1_naiveomp, matrA_CSR, matrB_CSR, matrC_CSR_naive_1_naiveomp);
+		//cout << "Matrix C_naive_1_naiveomp: N: " << matrC_CSR_naive_1_naiveomp.N << ", M: " << matrC_CSR_naive_1_naiveomp.M << ", nz: " << matrC_CSR_naive_1_naiveomp.row_id[matrC_CSR_naive_1_naiveomp.N] << endl;
+
+		transpose_this_CSR(&matrC_CSR_naive_1_naiveomp);
+		transpose_this_CSR(&matrC_CSR_naive_1_naiveomp);
+		comp_algo("matrC_CSR", "matrC_CSR_naive_1_naiveomp", matrC_CSR, matrC_CSR_naive_1_naiveomp);
+		delete_CSR(&matrC_CSR_naive_1_naiveomp);
+	}
+	cout << endl;
+
+	// matrC_CSR_naive_2_naiveomp
+	for (int i = 0; i < 3; i++) {
+		matrix_CSR matrC_CSR_naive_2_naiveomp;
+		//cout << "C_naive_2_naiveomp = A * B" << endl;
+		test_algo("matrix_mult_naive_2_naiveomp", matrix_mult_naive_2_naiveomp, matrA_CSR, matrB_CSR, matrC_CSR_naive_2_naiveomp);
+		//cout << "Matrix C_naive_2_naiveomp: N: " << matrC_CSR_naive_2_naiveomp.N << ", M: " << matrC_CSR_naive_2_naiveomp.M << ", nz: " << matrC_CSR_naive_2_naiveomp.row_id[matrC_CSR_naive_2_naiveomp.N] << endl;
+
+		transpose_this_CSR(&matrC_CSR_naive_2_naiveomp);
+		transpose_this_CSR(&matrC_CSR_naive_2_naiveomp);
+		comp_algo("matrC_CSR", "matrC_CSR_naive_2_naiveomp", matrC_CSR, matrC_CSR_naive_2_naiveomp);
+		delete_CSR(&matrC_CSR_naive_2_naiveomp);
+	}
+	cout << endl;
+
+	// matrC_CSR_naive_3_naiveomp
+	for (int i = 0; i < 3; i++) {
+		matrix_CSR matrC_CSR_naive_3_naiveomp;
+		//cout << "C_naive_3_naiveomp = A * B" << endl;
+		test_algo("matrix_mult_naive_3_naiveomp", matrix_mult_naive_3_naiveomp, matrA_CSR, matrB_CSR, matrC_CSR_naive_3_naiveomp);
+		//cout << "Matrix C_naive_3_naiveomp: N: " << matrC_CSR_naive_3_naiveomp.N << ", M: " << matrC_CSR_naive_3_naiveomp.M << ", nz: " << matrC_CSR_naive_3_naiveomp.row_id[matrC_CSR_naive_3_naiveomp.N] << endl;
+
+		transpose_this_CSR(&matrC_CSR_naive_3_naiveomp);
+		transpose_this_CSR(&matrC_CSR_naive_3_naiveomp);
+		comp_algo("matrC_CSR", "matrC_CSR_naive_3_naiveomp", matrC_CSR, matrC_CSR_naive_3_naiveomp);
+		delete_CSR(&matrC_CSR_naive_3_naiveomp);
 	}
 	cout << endl;
 
