@@ -50,7 +50,7 @@ void basic_test(matrix_CSR& matrA_CSR, matrix_CSR& matrB_CSR) {
 	transpose_this_CSR(&matrA_CSR); // !!! matrA_CSR should be sorted
 	transpose_this_CSR(&matrA_CSR);
 	transpose_this_CSR(&matrB_CSR); // !!! transpose matrix B !!!
-
+	/*
 	// matrC_CSR_naive_1
 	for (int i = 0; i < 3; i++) {
 		matrix_CSR matrC_CSR_naive_1;
@@ -92,7 +92,7 @@ void basic_test(matrix_CSR& matrA_CSR, matrix_CSR& matrB_CSR) {
 		delete_CSR(&matrC_CSR_naive_3);
 	}
 	cout << endl;
-	
+	*/
 	// matrC_CSR_naive_1_naiveomp
 	for (int i = 0; i < 3; i++) {
 		matrix_CSR matrC_CSR_naive_1_naiveomp;

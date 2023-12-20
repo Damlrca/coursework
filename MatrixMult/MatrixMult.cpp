@@ -1,4 +1,7 @@
 #include "MatrixMult.h"
+extern "C" {
+#include "MatrixUtils.h"
+}
 #include <stdlib.h>
 #include <vector>
 #include <queue>
@@ -124,32 +127,40 @@ int matrix_mult_naive_3(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_cs
 int matrix_mult_naive_1_naiveomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
 	// A[N][N] * B[N][N] = C[N][N]
 	int N = A_csr->N;
-	int nz = 0;
 	std::vector<int> row;
 	std::vector<int> col;
 	std::vector<double> val;
-#pragma omp parallel for
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			double t = 0.0;
-			for (int k = A_csr->row_id[i]; k < A_csr->row_id[i + 1]; k++) {
-				for (int l = B_csr->row_id[j]; l < B_csr->row_id[j + 1]; l++) {
-					if (A_csr->col[k] == B_csr->col[l]) {
-						t += A_csr->value[k] * B_csr->value[l];
+#pragma omp parallel
+	{
+		std::vector<int> row_temp;
+		std::vector<int> col_temp;
+		std::vector<double> val_temp;
+#pragma omp for
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < N; j++) {
+				double t = 0.0;
+				for (int k = A_csr->row_id[i]; k < A_csr->row_id[i + 1]; k++) {
+					for (int l = B_csr->row_id[j]; l < B_csr->row_id[j + 1]; l++) {
+						if (A_csr->col[k] == B_csr->col[l]) {
+							t += A_csr->value[k] * B_csr->value[l];
+						}
 					}
 				}
-			}
-			if (t != 0) {
-#pragma omp critical
-				{
-					row.push_back(i);
-					col.push_back(j);
-					val.push_back(t);
-					nz++;
+				if (t != 0) {
+					row_temp.push_back(i);
+					col_temp.push_back(j);
+					val_temp.push_back(t);
 				}
 			}
 		}
+#pragma omp critical
+		{
+			row.insert(row.end(), row_temp.begin(), row_temp.end());
+			col.insert(col.end(), col_temp.begin(), col_temp.end());
+			val.insert(val.end(), val_temp.begin(), val_temp.end());
+		}
 	}
+	int nz = row.size();
 	matrix_COO res_coo;
 	res_coo.N = res_coo.M = N;
 	res_coo.nz = nz;
@@ -163,38 +174,46 @@ int matrix_mult_naive_1_naiveomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 int matrix_mult_naive_2_naiveomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
 	// A[N][N] * B[N][N] = C[N][N]
 	int N = A_csr->N;
-	int nz = 0;
 	std::vector<int> row;
 	std::vector<int> col;
 	std::vector<double> val;
-#pragma omp parallel for
-	for (int i = 0; i < N; i++) {
-		for (int j = 0; j < N; j++) {
-			double t = 0.0;
-			for (int k = A_csr->row_id[i], l = B_csr->row_id[j]; k < A_csr->row_id[i + 1] && l < B_csr->row_id[j + 1];) {
-				if (A_csr->col[k] < B_csr->col[l]) {
-					k++;
+#pragma omp parallel
+	{
+		std::vector<int> row_temp;
+		std::vector<int> col_temp;
+		std::vector<double> val_temp;
+#pragma omp for
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < N; j++) {
+				double t = 0.0;
+				for (int k = A_csr->row_id[i], l = B_csr->row_id[j]; k < A_csr->row_id[i + 1] && l < B_csr->row_id[j + 1];) {
+					if (A_csr->col[k] < B_csr->col[l]) {
+						k++;
+					}
+					else if (A_csr->col[k] > B_csr->col[l]) {
+						l++;
+					}
+					else { // A_csr->col[k] == B_csr->col[l]
+						t += A_csr->value[k] * B_csr->value[l];
+						k++;
+						l++;
+					}
 				}
-				else if (A_csr->col[k] > B_csr->col[l]) {
-					l++;
-				}
-				else { // A_csr->col[k] == B_csr->col[l]
-					t += A_csr->value[k] * B_csr->value[l];
-					k++;
-					l++;
-				}
-			}
-			if (t != 0) {
-#pragma omp critical
-				{
-					row.push_back(i);
-					col.push_back(j);
-					val.push_back(t);
-					nz++;
+				if (t != 0) {
+					row_temp.push_back(i);
+					col_temp.push_back(j);
+					val_temp.push_back(t);
 				}
 			}
 		}
+#pragma omp critical
+		{
+			row.insert(row.end(), row_temp.begin(), row_temp.end());
+			col.insert(col.end(), col_temp.begin(), col_temp.end());
+			val.insert(val.end(), val_temp.begin(), val_temp.end());
+		}
 	}
+	int nz = row.size();
 	matrix_COO res_coo;
 	res_coo.N = res_coo.M = N;
 	res_coo.nz = nz;
@@ -208,7 +227,6 @@ int matrix_mult_naive_2_naiveomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 int matrix_mult_naive_3_naiveomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
 	// A[N][N] * B[N][N] = C[N][N]
 	int N = A_csr->N;
-	int nz = 0;
 	std::vector<int> row;
 	std::vector<int> col;
 	std::vector<double> val;
@@ -216,6 +234,9 @@ int matrix_mult_naive_3_naiveomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 #pragma omp parallel
 	{
 		std::vector<int> X(N, -1);
+		std::vector<int> row_temp;
+		std::vector<int> col_temp;
+		std::vector<double> val_temp;
 #pragma omp for
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < N; j++) {
@@ -232,17 +253,20 @@ int matrix_mult_naive_3_naiveomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 					X[A_csr->col[k]] = -1;
 				}
 				if (t != 0) {
-#pragma omp critical
-					{
-						row.push_back(i);
-						col.push_back(j);
-						val.push_back(t);
-						nz++;
-					}
+					row_temp.push_back(i);
+					col_temp.push_back(j);
+					val_temp.push_back(t);
 				}
 			}
 		}
+#pragma omp critical
+		{
+			row.insert(row.end(), row_temp.begin(), row_temp.end());
+			col.insert(col.end(), col_temp.begin(), col_temp.end());
+			val.insert(val.end(), val_temp.begin(), val_temp.end());
+		}
 	}
+	int nz = row.size();
 	matrix_COO res_coo;
 	res_coo.N = res_coo.M = N;
 	res_coo.nz = nz;
@@ -256,7 +280,6 @@ int matrix_mult_naive_3_naiveomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 int matrix_mult_naive_1_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
 	// A[N][N] * B[N][N] = C[N][N]
 	int N = A_csr->N;
-	int nz = 0;
 	std::vector<int> row;
 	std::vector<int> col;
 	std::vector<double> val;
@@ -268,6 +291,9 @@ int matrix_mult_naive_1_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 
 #pragma omp parallel
 	{
+		std::vector<int> row_temp;
+		std::vector<int> col_temp;
+		std::vector<double> val_temp;
 		int A = 0, B = 1;
 		while (A < B) {
 #pragma omp critical
@@ -292,19 +318,21 @@ int matrix_mult_naive_1_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 						}
 					}
 					if (t != 0) {
-#pragma omp critical
-						{
-							row.push_back(i);
-							col.push_back(j);
-							val.push_back(t);
-							nz++;
-						}
+						row_temp.push_back(i);
+						col_temp.push_back(j);
+						val_temp.push_back(t);
 					}
 				}
 			}
 		}
+#pragma omp critical
+		{
+			row.insert(row.end(), row_temp.begin(), row_temp.end());
+			col.insert(col.end(), col_temp.begin(), col_temp.end());
+			val.insert(val.end(), val_temp.begin(), val_temp.end());
+		}
 	}
-
+	int nz = row.size();
 	matrix_COO res_coo;
 	res_coo.N = res_coo.M = N;
 	res_coo.nz = nz;
@@ -318,7 +346,6 @@ int matrix_mult_naive_1_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 int matrix_mult_naive_2_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
 	// A[N][N] * B[N][N] = C[N][N]
 	int N = A_csr->N;
-	int nz = 0;
 	std::vector<int> row;
 	std::vector<int> col;
 	std::vector<double> val;
@@ -330,6 +357,9 @@ int matrix_mult_naive_2_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 
 #pragma omp parallel
 	{
+		std::vector<int> row_temp;
+		std::vector<int> col_temp;
+		std::vector<double> val_temp;
 		int A = 0, B = 1;
 		while (A < B) {
 #pragma omp critical
@@ -360,19 +390,21 @@ int matrix_mult_naive_2_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 						}
 					}
 					if (t != 0) {
-#pragma omp critical
-						{
-							row.push_back(i);
-							col.push_back(j);
-							val.push_back(t);
-							nz++;
-						}
+						row_temp.push_back(i);
+						col_temp.push_back(j);
+						val_temp.push_back(t);
 					}
 				}
 			}
 		}
+#pragma omp critical
+		{
+			row.insert(row.end(), row_temp.begin(), row_temp.end());
+			col.insert(col.end(), col_temp.begin(), col_temp.end());
+			val.insert(val.end(), val_temp.begin(), val_temp.end());
+		}
 	}
-
+	int nz = row.size();
 	matrix_COO res_coo;
 	res_coo.N = res_coo.M = N;
 	res_coo.nz = nz;
@@ -386,7 +418,6 @@ int matrix_mult_naive_2_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 int matrix_mult_naive_3_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
 	// A[N][N] * B[N][N] = C[N][N]
 	int N = A_csr->N;
-	int nz = 0;
 	std::vector<int> row;
 	std::vector<int> col;
 	std::vector<double> val;
@@ -398,6 +429,9 @@ int matrix_mult_naive_3_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 
 #pragma omp parallel
 	{
+		std::vector<int> row_temp;
+		std::vector<int> col_temp;
+		std::vector<double> val_temp;
 		int A = 0, B = 1;
 		std::vector<int> X(N, -1);
 		while (A < B) {
@@ -427,19 +461,21 @@ int matrix_mult_naive_3_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 						X[A_csr->col[k]] = -1;
 					}
 					if (t != 0) {
-#pragma omp critical
-						{
-							row.push_back(i);
-							col.push_back(j);
-							val.push_back(t);
-							nz++;
-						}
+						row_temp.push_back(i);
+						col_temp.push_back(j);
+						val_temp.push_back(t);
 					}
 				}
 			}
 		}
+#pragma omp critical
+		{
+			row.insert(row.end(), row_temp.begin(), row_temp.end());
+			col.insert(col.end(), col_temp.begin(), col_temp.end());
+			val.insert(val.end(), val_temp.begin(), val_temp.end());
+		}
 	}
-
+	int nz = row.size();
 	matrix_COO res_coo;
 	res_coo.N = res_coo.M = N;
 	res_coo.nz = nz;
