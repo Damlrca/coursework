@@ -3,6 +3,7 @@ extern "C" {
 #include "MatrixUtils.h"
 }
 #include <stdlib.h>
+#include <cstring>
 #include <vector>
 #include <queue>
 #include <utility>
@@ -127,116 +128,103 @@ int matrix_mult_naive_3(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_cs
 int matrix_mult_naive_1_naiveomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
 	// A[N][N] * B[N][N] = C[N][N]
 	int N = A_csr->N;
-	std::vector<int> row;
-	std::vector<int> col;
-	std::vector<double> val;
-#pragma omp parallel
-	{
-		std::vector<int> row_temp;
-		std::vector<int> col_temp;
-		std::vector<double> val_temp;
-#pragma omp for
-		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < N; j++) {
-				double t = 0.0;
-				for (int k = A_csr->row_id[i]; k < A_csr->row_id[i + 1]; k++) {
-					for (int l = B_csr->row_id[j]; l < B_csr->row_id[j + 1]; l++) {
-						if (A_csr->col[k] == B_csr->col[l]) {
-							t += A_csr->value[k] * B_csr->value[l];
-						}
+	std::vector<std::vector<int>> col(N);
+	std::vector<std::vector<double>> val(N);
+#pragma omp parallel for
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			double t = 0.0;
+			for (int k = A_csr->row_id[i]; k < A_csr->row_id[i + 1]; k++) {
+				for (int l = B_csr->row_id[j]; l < B_csr->row_id[j + 1]; l++) {
+					if (A_csr->col[k] == B_csr->col[l]) {
+						t += A_csr->value[k] * B_csr->value[l];
 					}
 				}
-				if (t != 0) {
-					row_temp.push_back(i);
-					col_temp.push_back(j);
-					val_temp.push_back(t);
-				}
+			}
+			if (t != 0) {
+				col[i].push_back(j);
+				val[i].push_back(t);
 			}
 		}
-#pragma omp critical
-		{
-			row.insert(row.end(), row_temp.begin(), row_temp.end());
-			col.insert(col.end(), col_temp.begin(), col_temp.end());
-			val.insert(val.end(), val_temp.begin(), val_temp.end());
+	}
+	Res_csr->N = N;
+	Res_csr->M = N;
+	Res_csr->row_id = (int*)malloc((N + 1) * sizeof(int));
+	int nz = 0;
+	for (int i = 0; i < N; i++) {
+		Res_csr->row_id[i] = nz;
+		nz += col[i].size();
+	}
+	Res_csr->row_id[N] = nz;
+	Res_csr->col = (int*)malloc(nz * sizeof(int));
+	Res_csr->value = (double*)malloc(nz * sizeof(double));
+#pragma omp parallel for
+	for (int i = 0; i < N; i++) {
+		if (col[i].size()) {
+			std::memcpy(Res_csr->col + Res_csr->row_id[i], col[i].data(), sizeof(int) * col[i].size());
+			std::memcpy(Res_csr->value + Res_csr->row_id[i], val[i].data(), sizeof(double) * val[i].size());
 		}
 	}
-	int nz = row.size();
-	matrix_COO res_coo;
-	res_coo.N = res_coo.M = N;
-	res_coo.nz = nz;
-	res_coo.I = row.data();
-	res_coo.J = col.data();
-	res_coo.val = val.data();
-	convert_COO_to_CSR(&res_coo, Res_csr);
 	return 0;
 }
 
 int matrix_mult_naive_2_naiveomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
 	// A[N][N] * B[N][N] = C[N][N]
 	int N = A_csr->N;
-	std::vector<int> row;
-	std::vector<int> col;
-	std::vector<double> val;
-#pragma omp parallel
-	{
-		std::vector<int> row_temp;
-		std::vector<int> col_temp;
-		std::vector<double> val_temp;
-#pragma omp for
-		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < N; j++) {
-				double t = 0.0;
-				for (int k = A_csr->row_id[i], l = B_csr->row_id[j]; k < A_csr->row_id[i + 1] && l < B_csr->row_id[j + 1];) {
-					if (A_csr->col[k] < B_csr->col[l]) {
-						k++;
-					}
-					else if (A_csr->col[k] > B_csr->col[l]) {
-						l++;
-					}
-					else { // A_csr->col[k] == B_csr->col[l]
-						t += A_csr->value[k] * B_csr->value[l];
-						k++;
-						l++;
-					}
+	std::vector<std::vector<int>> col(N);
+	std::vector<std::vector<double>> val(N);
+#pragma omp parallel for
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			double t = 0.0;
+			for (int k = A_csr->row_id[i], l = B_csr->row_id[j]; k < A_csr->row_id[i + 1] && l < B_csr->row_id[j + 1];) {
+				if (A_csr->col[k] < B_csr->col[l]) {
+					k++;
 				}
-				if (t != 0) {
-					row_temp.push_back(i);
-					col_temp.push_back(j);
-					val_temp.push_back(t);
+				else if (A_csr->col[k] > B_csr->col[l]) {
+					l++;
+				}
+				else { // A_csr->col[k] == B_csr->col[l]
+					t += A_csr->value[k] * B_csr->value[l];
+					k++;
+					l++;
 				}
 			}
-		}
-#pragma omp critical
-		{
-			row.insert(row.end(), row_temp.begin(), row_temp.end());
-			col.insert(col.end(), col_temp.begin(), col_temp.end());
-			val.insert(val.end(), val_temp.begin(), val_temp.end());
+			if (t != 0) {
+				col[i].push_back(j);
+				val[i].push_back(t);
+			}
 		}
 	}
-	int nz = row.size();
-	matrix_COO res_coo;
-	res_coo.N = res_coo.M = N;
-	res_coo.nz = nz;
-	res_coo.I = row.data();
-	res_coo.J = col.data();
-	res_coo.val = val.data();
-	convert_COO_to_CSR(&res_coo, Res_csr);
+	Res_csr->N = N;
+	Res_csr->M = N;
+	Res_csr->row_id = (int*)malloc((N + 1) * sizeof(int));
+	int nz = 0;
+	for (int i = 0; i < N; i++) {
+		Res_csr->row_id[i] = nz;
+		nz += col[i].size();
+	}
+	Res_csr->row_id[N] = nz;
+	Res_csr->col = (int*)malloc(nz * sizeof(int));
+	Res_csr->value = (double*)malloc(nz * sizeof(double));
+#pragma omp parallel for
+	for (int i = 0; i < N; i++) {
+		if (col[i].size()) {
+			std::memcpy(Res_csr->col + Res_csr->row_id[i], col[i].data(), sizeof(int) * col[i].size());
+			std::memcpy(Res_csr->value + Res_csr->row_id[i], val[i].data(), sizeof(double) * val[i].size());
+		}
+	}
 	return 0;
 }
 
 int matrix_mult_naive_3_naiveomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
 	// A[N][N] * B[N][N] = C[N][N]
 	int N = A_csr->N;
-	std::vector<int> row;
-	std::vector<int> col;
-	std::vector<double> val;
-
+	std::vector<std::vector<int>> col(N);
+	std::vector<std::vector<double>> val(N);
 #pragma omp parallel
 	{
 		std::vector<int> X(N, -1);
-		std::vector<int> row_temp;
-		std::vector<int> col_temp;
-		std::vector<double> val_temp;
 #pragma omp for
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < N; j++) {
@@ -253,36 +241,38 @@ int matrix_mult_naive_3_naiveomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 					X[A_csr->col[k]] = -1;
 				}
 				if (t != 0) {
-					row_temp.push_back(i);
-					col_temp.push_back(j);
-					val_temp.push_back(t);
+					col[i].push_back(j);
+					val[i].push_back(t);
 				}
 			}
 		}
-#pragma omp critical
-		{
-			row.insert(row.end(), row_temp.begin(), row_temp.end());
-			col.insert(col.end(), col_temp.begin(), col_temp.end());
-			val.insert(val.end(), val_temp.begin(), val_temp.end());
+	}
+	Res_csr->N = N;
+	Res_csr->M = N;
+	Res_csr->row_id = (int*)malloc((N + 1) * sizeof(int));
+	int nz = 0;
+	for (int i = 0; i < N; i++) {
+		Res_csr->row_id[i] = nz;
+		nz += col[i].size();
+	}
+	Res_csr->row_id[N] = nz;
+	Res_csr->col = (int*)malloc(nz * sizeof(int));
+	Res_csr->value = (double*)malloc(nz * sizeof(double));
+#pragma omp parallel for
+	for (int i = 0; i < N; i++) {
+		if (col[i].size()) {
+			std::memcpy(Res_csr->col + Res_csr->row_id[i], col[i].data(), sizeof(int) * col[i].size());
+			std::memcpy(Res_csr->value + Res_csr->row_id[i], val[i].data(), sizeof(double) * val[i].size());
 		}
 	}
-	int nz = row.size();
-	matrix_COO res_coo;
-	res_coo.N = res_coo.M = N;
-	res_coo.nz = nz;
-	res_coo.I = row.data();
-	res_coo.J = col.data();
-	res_coo.val = val.data();
-	convert_COO_to_CSR(&res_coo, Res_csr);
 	return 0;
 }
 
 int matrix_mult_naive_1_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
 	// A[N][N] * B[N][N] = C[N][N]
 	int N = A_csr->N;
-	std::vector<int> row;
-	std::vector<int> col;
-	std::vector<double> val;
+	std::vector<std::vector<int>> col(N);
+	std::vector<std::vector<double>> val(N);
 
 	std::queue<std::pair<int, int>> tasks;
 	for (int i = 0; i < N; i += 50) {
@@ -291,9 +281,6 @@ int matrix_mult_naive_1_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 
 #pragma omp parallel
 	{
-		std::vector<int> row_temp;
-		std::vector<int> col_temp;
-		std::vector<double> val_temp;
 		int A = 0, B = 1;
 		while (A < B) {
 #pragma omp critical
@@ -318,37 +305,39 @@ int matrix_mult_naive_1_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 						}
 					}
 					if (t != 0) {
-						row_temp.push_back(i);
-						col_temp.push_back(j);
-						val_temp.push_back(t);
+						col[i].push_back(j);
+						val[i].push_back(t);
 					}
 				}
 			}
 		}
-#pragma omp critical
-		{
-			row.insert(row.end(), row_temp.begin(), row_temp.end());
-			col.insert(col.end(), col_temp.begin(), col_temp.end());
-			val.insert(val.end(), val_temp.begin(), val_temp.end());
+	}
+	Res_csr->N = N;
+	Res_csr->M = N;
+	Res_csr->row_id = (int*)malloc((N + 1) * sizeof(int));
+	int nz = 0;
+	for (int i = 0; i < N; i++) {
+		Res_csr->row_id[i] = nz;
+		nz += col[i].size();
+	}
+	Res_csr->row_id[N] = nz;
+	Res_csr->col = (int*)malloc(nz * sizeof(int));
+	Res_csr->value = (double*)malloc(nz * sizeof(double));
+#pragma omp parallel for
+	for (int i = 0; i < N; i++) {
+		if (col[i].size()) {
+			std::memcpy(Res_csr->col + Res_csr->row_id[i], col[i].data(), sizeof(int) * col[i].size());
+			std::memcpy(Res_csr->value + Res_csr->row_id[i], val[i].data(), sizeof(double) * val[i].size());
 		}
 	}
-	int nz = row.size();
-	matrix_COO res_coo;
-	res_coo.N = res_coo.M = N;
-	res_coo.nz = nz;
-	res_coo.I = row.data();
-	res_coo.J = col.data();
-	res_coo.val = val.data();
-	convert_COO_to_CSR(&res_coo, Res_csr);
 	return 0;
 }
 
 int matrix_mult_naive_2_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
 	// A[N][N] * B[N][N] = C[N][N]
 	int N = A_csr->N;
-	std::vector<int> row;
-	std::vector<int> col;
-	std::vector<double> val;
+	std::vector<std::vector<int>> col(N);
+	std::vector<std::vector<double>> val(N);
 
 	std::queue<std::pair<int, int>> tasks;
 	for (int i = 0; i < N; i += 50) {
@@ -357,9 +346,6 @@ int matrix_mult_naive_2_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 
 #pragma omp parallel
 	{
-		std::vector<int> row_temp;
-		std::vector<int> col_temp;
-		std::vector<double> val_temp;
 		int A = 0, B = 1;
 		while (A < B) {
 #pragma omp critical
@@ -390,37 +376,39 @@ int matrix_mult_naive_2_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 						}
 					}
 					if (t != 0) {
-						row_temp.push_back(i);
-						col_temp.push_back(j);
-						val_temp.push_back(t);
+						col[i].push_back(j);
+						val[i].push_back(t);
 					}
 				}
 			}
 		}
-#pragma omp critical
-		{
-			row.insert(row.end(), row_temp.begin(), row_temp.end());
-			col.insert(col.end(), col_temp.begin(), col_temp.end());
-			val.insert(val.end(), val_temp.begin(), val_temp.end());
+	}
+	Res_csr->N = N;
+	Res_csr->M = N;
+	Res_csr->row_id = (int*)malloc((N + 1) * sizeof(int));
+	int nz = 0;
+	for (int i = 0; i < N; i++) {
+		Res_csr->row_id[i] = nz;
+		nz += col[i].size();
+	}
+	Res_csr->row_id[N] = nz;
+	Res_csr->col = (int*)malloc(nz * sizeof(int));
+	Res_csr->value = (double*)malloc(nz * sizeof(double));
+#pragma omp parallel for
+	for (int i = 0; i < N; i++) {
+		if (col[i].size()) {
+			std::memcpy(Res_csr->col + Res_csr->row_id[i], col[i].data(), sizeof(int) * col[i].size());
+			std::memcpy(Res_csr->value + Res_csr->row_id[i], val[i].data(), sizeof(double) * val[i].size());
 		}
 	}
-	int nz = row.size();
-	matrix_COO res_coo;
-	res_coo.N = res_coo.M = N;
-	res_coo.nz = nz;
-	res_coo.I = row.data();
-	res_coo.J = col.data();
-	res_coo.val = val.data();
-	convert_COO_to_CSR(&res_coo, Res_csr);
 	return 0;
 }
 
 int matrix_mult_naive_3_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
 	// A[N][N] * B[N][N] = C[N][N]
 	int N = A_csr->N;
-	std::vector<int> row;
-	std::vector<int> col;
-	std::vector<double> val;
+	std::vector<std::vector<int>> col(N);
+	std::vector<std::vector<double>> val(N);
 
 	std::queue<std::pair<int, int>> tasks;
 	for (int i = 0; i < N; i += 100) {
@@ -429,9 +417,6 @@ int matrix_mult_naive_3_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 
 #pragma omp parallel
 	{
-		std::vector<int> row_temp;
-		std::vector<int> col_temp;
-		std::vector<double> val_temp;
 		int A = 0, B = 1;
 		std::vector<int> X(N, -1);
 		while (A < B) {
@@ -461,27 +446,30 @@ int matrix_mult_naive_3_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 						X[A_csr->col[k]] = -1;
 					}
 					if (t != 0) {
-						row_temp.push_back(i);
-						col_temp.push_back(j);
-						val_temp.push_back(t);
+						col[i].push_back(j);
+						val[i].push_back(t);
 					}
 				}
 			}
 		}
-#pragma omp critical
-		{
-			row.insert(row.end(), row_temp.begin(), row_temp.end());
-			col.insert(col.end(), col_temp.begin(), col_temp.end());
-			val.insert(val.end(), val_temp.begin(), val_temp.end());
+	}
+	Res_csr->N = N;
+	Res_csr->M = N;
+	Res_csr->row_id = (int*)malloc((N + 1) * sizeof(int));
+	int nz = 0;
+	for (int i = 0; i < N; i++) {
+		Res_csr->row_id[i] = nz;
+		nz += col[i].size();
+	}
+	Res_csr->row_id[N] = nz;
+	Res_csr->col = (int*)malloc(nz * sizeof(int));
+	Res_csr->value = (double*)malloc(nz * sizeof(double));
+#pragma omp parallel for
+	for (int i = 0; i < N; i++) {
+		if (col[i].size()) {
+			std::memcpy(Res_csr->col + Res_csr->row_id[i], col[i].data(), sizeof(int) * col[i].size());
+			std::memcpy(Res_csr->value + Res_csr->row_id[i], val[i].data(), sizeof(double) * val[i].size());
 		}
 	}
-	int nz = row.size();
-	matrix_COO res_coo;
-	res_coo.N = res_coo.M = N;
-	res_coo.nz = nz;
-	res_coo.I = row.data();
-	res_coo.J = col.data();
-	res_coo.val = val.data();
-	convert_COO_to_CSR(&res_coo, Res_csr);
 	return 0;
 }
