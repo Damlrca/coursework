@@ -158,7 +158,6 @@ int matrix_mult_naive_1_naiveomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 	Res_csr->row_id[N] = nz;
 	Res_csr->col = (int*)malloc(nz * sizeof(int));
 	Res_csr->value = (double*)malloc(nz * sizeof(double));
-#pragma omp parallel for
 	for (int i = 0; i < N; i++) {
 		if (col[i].size()) {
 			std::memcpy(Res_csr->col + Res_csr->row_id[i], col[i].data(), sizeof(int) * col[i].size());
@@ -207,7 +206,6 @@ int matrix_mult_naive_2_naiveomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 	Res_csr->row_id[N] = nz;
 	Res_csr->col = (int*)malloc(nz * sizeof(int));
 	Res_csr->value = (double*)malloc(nz * sizeof(double));
-#pragma omp parallel for
 	for (int i = 0; i < N; i++) {
 		if (col[i].size()) {
 			std::memcpy(Res_csr->col + Res_csr->row_id[i], col[i].data(), sizeof(int) * col[i].size());
@@ -258,7 +256,6 @@ int matrix_mult_naive_3_naiveomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 	Res_csr->row_id[N] = nz;
 	Res_csr->col = (int*)malloc(nz * sizeof(int));
 	Res_csr->value = (double*)malloc(nz * sizeof(double));
-#pragma omp parallel for
 	for (int i = 0; i < N; i++) {
 		if (col[i].size()) {
 			std::memcpy(Res_csr->col + Res_csr->row_id[i], col[i].data(), sizeof(int) * col[i].size());
@@ -268,15 +265,15 @@ int matrix_mult_naive_3_naiveomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 	return 0;
 }
 
-int matrix_mult_naive_1_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
+int matrix_mult_naive_1_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr, int delta) {
 	// A[N][N] * B[N][N] = C[N][N]
 	int N = A_csr->N;
 	std::vector<std::vector<int>> col(N);
 	std::vector<std::vector<double>> val(N);
 
 	std::queue<std::pair<int, int>> tasks;
-	for (int i = 0; i < N; i += 50) {
-		tasks.push({ i, std::min(i + 50, N) });
+	for (int i = 0; i < N; i += delta) {
+		tasks.push({ i, std::min(i + delta, N) });
 	}
 
 #pragma omp parallel
@@ -323,7 +320,6 @@ int matrix_mult_naive_1_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 	Res_csr->row_id[N] = nz;
 	Res_csr->col = (int*)malloc(nz * sizeof(int));
 	Res_csr->value = (double*)malloc(nz * sizeof(double));
-#pragma omp parallel for
 	for (int i = 0; i < N; i++) {
 		if (col[i].size()) {
 			std::memcpy(Res_csr->col + Res_csr->row_id[i], col[i].data(), sizeof(int) * col[i].size());
@@ -333,15 +329,15 @@ int matrix_mult_naive_1_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 	return 0;
 }
 
-int matrix_mult_naive_2_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
+int matrix_mult_naive_2_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr, int delta) {
 	// A[N][N] * B[N][N] = C[N][N]
 	int N = A_csr->N;
 	std::vector<std::vector<int>> col(N);
 	std::vector<std::vector<double>> val(N);
 
 	std::queue<std::pair<int, int>> tasks;
-	for (int i = 0; i < N; i += 50) {
-		tasks.push({ i, std::min(i + 50, N) });
+	for (int i = 0; i < N; i += delta) {
+		tasks.push({ i, std::min(i + delta, N) });
 	}
 
 #pragma omp parallel
@@ -394,7 +390,6 @@ int matrix_mult_naive_2_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 	Res_csr->row_id[N] = nz;
 	Res_csr->col = (int*)malloc(nz * sizeof(int));
 	Res_csr->value = (double*)malloc(nz * sizeof(double));
-#pragma omp parallel for
 	for (int i = 0; i < N; i++) {
 		if (col[i].size()) {
 			std::memcpy(Res_csr->col + Res_csr->row_id[i], col[i].data(), sizeof(int) * col[i].size());
@@ -404,15 +399,15 @@ int matrix_mult_naive_2_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 	return 0;
 }
 
-int matrix_mult_naive_3_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
+int matrix_mult_naive_3_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr, int delta) {
 	// A[N][N] * B[N][N] = C[N][N]
 	int N = A_csr->N;
 	std::vector<std::vector<int>> col(N);
 	std::vector<std::vector<double>> val(N);
 
 	std::queue<std::pair<int, int>> tasks;
-	for (int i = 0; i < N; i += 100) {
-		tasks.push({ i, std::min(i + 100, N) });
+	for (int i = 0; i < N; i += delta) {
+		tasks.push({ i, std::min(i + delta, N) });
 	}
 
 #pragma omp parallel
@@ -464,7 +459,6 @@ int matrix_mult_naive_3_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 	Res_csr->row_id[N] = nz;
 	Res_csr->col = (int*)malloc(nz * sizeof(int));
 	Res_csr->value = (double*)malloc(nz * sizeof(double));
-#pragma omp parallel for
 	for (int i = 0; i < N; i++) {
 		if (col[i].size()) {
 			std::memcpy(Res_csr->col + Res_csr->row_id[i], col[i].data(), sizeof(int) * col[i].size());
