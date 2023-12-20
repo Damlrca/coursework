@@ -392,8 +392,8 @@ int matrix_mult_naive_3_queueomp(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CS
 	std::vector<double> val;
 
 	std::queue<std::pair<int, int>> tasks;
-	for (int i = 0; i < N; i += 50) {
-		tasks.push({ i, std::min(i + 50, N) });
+	for (int i = 0; i < N; i += 100) {
+		tasks.push({ i, std::min(i + 100, N) });
 	}
 
 #pragma omp parallel

@@ -199,19 +199,20 @@ int main() {
 	basic_test(matrA_CSR, matrB_CSR);
 
 	delete_CSR(&matrA_CSR);
-	delete_CSR(&matrB_CSR);
+	//delete_CSR(&matrB_CSR);
 
 	cout << "-------------------------------------------" << endl;
-	cout << "test nonuniform matrix 10'000 x 10'000, k1 = 1, k2 = 30" << endl;
+	cout << "test nonuniform matrix 10'000 x 10'000, k1 = 30, k2 = 1" << endl;
 	cout << "-------------------------------------------" << endl;
 	cout << endl;
 
-	generate_nonuniform_square_sparse_matrix_CSR(10'000, 1, 30, matrA_CSR);
+	generate_nonuniform_square_sparse_matrix_CSR(10'000, 30, 1, matrA_CSR);
 	cout << "Matrix A generated successfully" << endl;
 	cout << "Matrix A: N: " << matrA_CSR.N << ", M: " << matrA_CSR.M << ", nz: " << matrA_CSR.row_id[matrA_CSR.N] << endl;
-	generate_nonuniform_square_sparse_matrix_CSR(10'000, 1, 30, matrB_CSR);
-	cout << "Matrix B generated successfully" << endl;
-	cout << "Matrix B: N: " << matrB_CSR.N << ", M: " << matrB_CSR.M << ", nz: " << matrB_CSR.row_id[matrB_CSR.N] << endl;
+	//generate_nonuniform_square_sparse_matrix_CSR(10'000, 30, 1, matrB_CSR);
+	//cout << "Matrix B generated successfully" << endl;
+	//cout << "Matrix B: N: " << matrB_CSR.N << ", M: " << matrB_CSR.M << ", nz: " << matrB_CSR.row_id[matrB_CSR.N] << endl;
+	transpose_this_CSR(&matrB_CSR);
 	cout << endl;
 
 	basic_test(matrA_CSR, matrB_CSR);
