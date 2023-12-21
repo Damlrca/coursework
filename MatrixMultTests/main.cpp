@@ -53,7 +53,7 @@ void comp_algo(const char* algo_name_1, const char* algo_name_2, matrix_CSR& C_c
 	}
 }
 
-constexpr int TEST_NUM = 1;
+constexpr int TEST_NUM = 10;
 
 void my_test(const char* algo_name, matrix_CSR& matrA_CSR, matrix_CSR& matrB_CSR, int (*algo) (matrix_CSR*, matrix_CSR*, matrix_CSR*),
 	const char* algo_base_name, matrix_CSR& matrC_CSR_base) {
@@ -147,7 +147,7 @@ int main() {
 
 	{
 		cout << "-------------------------------------------" << endl;
-		cout << "test1 C = A * B" << endl;
+		cout << "test2 C = A * B" << endl;
 		cout << "A: 10'000 x 10'000, from 30 to 1 non-elements in rows" << endl;
 		cout << "B: 10'000 x 10'000, 15 non-empty elements in every row" << endl;
 		cout << "-------------------------------------------" << endl;
@@ -170,7 +170,7 @@ int main() {
 
 	{
 		cout << "-------------------------------------------" << endl;
-		cout << "test1 C = A * B" << endl;
+		cout << "test3 C = A * B" << endl;
 		cout << "A: 20'000 x 20'000, 25 non-empty elements in every row" << endl;
 		cout << "B: 20'000 x 20'000, 25 non-empty elements in every row" << endl;
 		cout << "-------------------------------------------" << endl;
@@ -192,7 +192,7 @@ int main() {
 
 	{
 		cout << "-------------------------------------------" << endl;
-		cout << "test1 C = A * B" << endl;
+		cout << "test4 C = A * B" << endl;
 		cout << "A: 20'000 x 20'000, from 50 to 1 non-elements in rows" << endl;
 		cout << "B: 20'000 x 20'000, 25 non-empty elements in every row" << endl;
 		cout << "-------------------------------------------" << endl;
