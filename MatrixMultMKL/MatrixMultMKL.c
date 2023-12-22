@@ -1,5 +1,7 @@
 #include "MatrixMultMKL.h"
 #include "mkl_spblas.h"
+#include <stdlib.h>
+#include <string.h>
 
 int matrix_mult_mkl(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
 	sparse_matrix_t matrA;
@@ -16,14 +18,21 @@ int matrix_mult_mkl(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr) {
 
 	sparse_index_base_t index_Res;
 	int* row_end_Res;
-	mkl_sparse_d_export_csr(matrRes, &index_Res, &Res_csr->N, &Res_csr->M, &Res_csr->row_id, &row_end_Res, &Res_csr->col, &Res_csr->value);
+	matrix_CSR temp;
+	mkl_sparse_d_export_csr(matrRes, &index_Res, &temp.N, &temp.M, &temp.row_id, &row_end_Res, &temp.col, &temp.value);
+
+	Res_csr->N = temp.N;
+	Res_csr->M = temp.M;
+	Res_csr->row_id = (int*)malloc((Res_csr->N + 1) * sizeof(int));
+	memcpy(Res_csr->row_id, temp.row_id, (Res_csr->N + 1) * sizeof(int));
+	int nz = Res_csr->row_id[Res_csr->N];
+	Res_csr->col = (int*)malloc(nz * sizeof(int));
+	memcpy(Res_csr->col, temp.col, nz * sizeof(int));
+	Res_csr->value = (double*)malloc(nz * sizeof(double));
+	memcpy(Res_csr->value, temp.value, nz * sizeof(double));
 
 	mkl_sparse_destroy(matrA);
 	mkl_sparse_destroy(matrB);
-	//mkl_sparse_destroy(matrC);
-	//delete_CSR(&matrA_CSR);
-	//delete_CSR(&matrB_CSR);
-	//delete_CSR(&matrC_CSR);
-	// TODO : how destoy correct ?
+	mkl_sparse_destroy(matrRes);
 	return 0;
 }
