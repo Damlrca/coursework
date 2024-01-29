@@ -404,6 +404,8 @@ FodyWeavers.xsd
 !littlematrix.mtx
 !add1.mtx
 !add2.mtx
+!littlemult1.mtx
+!littlemult2.mtx
 # Directory for solution
 sln/
 # Binary files

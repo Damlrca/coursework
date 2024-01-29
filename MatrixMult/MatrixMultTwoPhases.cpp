@@ -8,7 +8,7 @@ extern "C" {
 #include <utility>
 #include <algorithm>
 
-int matrix_mult_TF_queueomp_first_phase(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr, int delta) {
+int matrix_mult_TF_first_phase(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr, int delta) {
 	int N = A_csr->N;
 	std::vector<std::vector<int>> col(N);
 
@@ -71,7 +71,7 @@ int matrix_mult_TF_queueomp_first_phase(matrix_CSR* A_csr, matrix_CSR* B_csr, ma
 	return 0;
 }
 
-int matrix_mult_TF_queueomp_second_phase(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr, int delta) {
+int matrix_mult_TF_second_phase(matrix_CSR* A_csr, matrix_CSR* B_csr, matrix_CSR* Res_csr, int delta) {
 	int N = A_csr->N;
 
 	std::queue<std::pair<int, int>> tasks;
